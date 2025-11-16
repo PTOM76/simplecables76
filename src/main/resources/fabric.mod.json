@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "simplecables76",
+  "version": "${version}",
+  "name": "SimpleCables",
+  "description": "Adds new cables for FabricMC",
+  "authors": [
+    "Pitan"
+  ],
+  "contact": {
+    "sources": "https://github.com/PTOM76/simplecables76",
+    "issues": "https://github.com/PTOM76/simplecables76/issues",
+    "homepage": "https://curseforge/minecraft/mc-mods/simplecables76"
+  },
+  "license": "MIT",
+  "icon": "assets/simplecables76/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "net.pitan76.simplecables76.client.SimpleCablesClient"
+    ],
+    "main": [
+      "net.pitan76.simplecables76.SimpleCables"
+    ]
+  },
+  "depends": {
+    "fabricloader": "*",
+    "fabric-language-kotlin": "*",
+    "fabric": "*",
+    "minecraft": "*",
+    "mcpitanlib": ">=3.0.0"
+  }
+}
