@@ -22,4 +22,8 @@ class EnergyCable(settings: CompatibleBlockSettings) : AbstractCable(settings), 
     override fun createBlockEntity(e: TileCreateEvent): CompatBlockEntity {
         return EnergyCableBlockEntity(e)
     }
+
+    override fun isTick(): Boolean {
+        return true
+    }
 }
