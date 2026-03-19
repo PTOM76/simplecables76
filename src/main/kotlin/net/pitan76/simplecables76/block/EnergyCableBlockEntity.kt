@@ -1,5 +1,6 @@
 package net.pitan76.simplecables76.block
 
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
@@ -41,19 +42,30 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
         val dirs = listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)
         for (dir in dirs) {
             val neighborPos = pos.offset(dir)
-            if (e.blockEntity is BaseEnergyTile) {
+            val neighborBlockEntity = world.getBlockEntity(neighborPos)
+
+            if (neighborBlockEntity.get() is BaseEnergyTile) {
                 val sendAmount = minOf(this.maxOutput, this.energy)
                 if (sendAmount > 0) {
                     val inserted = e.blockEntity.insertEnergy(sendAmount)
                     this.energy -= inserted
                 }
-            } else {
+
+                return
+            }
+
+            if (getEnergyStorage() is TREnergyStorage) {
                 val storage = EnergyStorage.SIDED.find(world.toMinecraft(), neighborPos.toMinecraft(), dir.opposite.toMinecraft())
                 if (storage != null && storage !is TREnergyStorage) {
-                    val sendAmount = minOf(this.maxOutput.toLong(), this.energy.toLong())
+                    val sendAmount = minOf(this.maxOutput, this.energy)
                     if (sendAmount > 0) {
-                        val inserted = storage.insert(sendAmount, null)
-                        this.energy -= inserted.toInt()
+                        Transaction.openOuter().use { transaction ->
+                            val inserted = storage.insert(sendAmount, transaction)
+                            if (inserted > 0) {
+                                transaction.commit()
+                                this.energy -= inserted.toInt()
+                            }
+                        }
                     }
                 }
             }
