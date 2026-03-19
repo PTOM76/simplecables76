@@ -6,11 +6,11 @@ import net.pitan76.mcpitanlib.api.registry.result.SupplierResult
 import net.pitan76.mcpitanlib.api.tile.v2.BlockEntityTypeBuilder
 import net.pitan76.mcpitanlib.api.tile.BlockEntityTypeBuilder.Factory
 import net.pitan76.mcpitanlib.midohra.block.SupplierBlockWrapper
-import net.pitan76.simplecables76.SimpleCables._id
-import net.pitan76.simplecables76.SimpleCables.registry
+import net.pitan76.simplecables76.SimpleCables.Companion._id
+import net.pitan76.simplecables76.SimpleCables.Companion.registry
 
 object BlockEntities {
-    lateinit var ENERGY_CABLE: SupplierResult<BlockEntityType<EnergyCableBlockEntity?>>
+    lateinit var ENERGY_CABLE: SupplierResult<BlockEntityType<EnergyCableBlockEntity?>>;
 
     @JvmStatic
     fun init() {

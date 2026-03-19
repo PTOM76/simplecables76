@@ -44,6 +44,8 @@ dependencies {
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
     modImplementation("net.pitan76:mcpitanlib-fabric-${project.property("mcpitanlib_version")}")
+
+    modImplementation("teamreborn:energy:${project.property("tr_energy_version")}")
 }
 
 tasks.processResources {

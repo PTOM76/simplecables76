@@ -5,7 +5,7 @@ import net.pitan76.mcpitanlib.api.item.v2.CompatibleItemSettings
 import net.pitan76.mcpitanlib.api.registry.result.RegistryResult
 import net.pitan76.mcpitanlib.api.util.item.ItemUtil
 import net.pitan76.mcpitanlib.guilib.MPLGuiLib._id
-import net.pitan76.simplecables76.SimpleCables.registry
+import net.pitan76.simplecables76.SimpleCables.Companion.registry
 import net.pitan76.simplecables76.block.Blocks
 
 object Items {
