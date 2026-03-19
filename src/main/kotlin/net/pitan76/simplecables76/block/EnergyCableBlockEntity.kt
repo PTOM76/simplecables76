@@ -42,12 +42,12 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
         val dirs = listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)
         for (dir in dirs) {
             val neighborPos = pos.offset(dir)
-            val neighborBlockEntity = world.getBlockEntity(neighborPos)
+            val neighborBlockEntity = world.getBlockEntity(neighborPos).get()
 
-            if (neighborBlockEntity.get() is BaseEnergyTile) {
+            if (neighborBlockEntity is BaseEnergyTile) {
                 val sendAmount = minOf(this.maxOutput, this.energy)
                 if (sendAmount > 0) {
-                    val inserted = e.blockEntity.insertEnergy(sendAmount)
+                    val inserted = neighborBlockEntity.insertEnergy(sendAmount)
                     this.energy -= inserted
                 }
 
