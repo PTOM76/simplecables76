@@ -17,12 +17,14 @@ import net.pitan76.mcpitanlib.api.util.TextUtil
 class EnergyCable : AbstractCable, CompatWaterloggable {
 
     constructor(settings: CompatibleBlockSettings) : super(settings) {
-        setDefaultState(defaultMidohraState.with(CompatProperties.UP, false)
+        setDefaultState(defaultMidohraState
+            .with(CompatProperties.UP, false)
             .with(CompatProperties.DOWN, false)
             .with(CompatProperties.NORTH, false)
             .with(CompatProperties.EAST, false)
             .with(CompatProperties.SOUTH, false)
-            .with(CompatProperties.WEST, false))
+            .with(CompatProperties.WEST, false)
+        )
     }
 
     override fun onRightClick(e: BlockUseEvent): CompatActionResult {
