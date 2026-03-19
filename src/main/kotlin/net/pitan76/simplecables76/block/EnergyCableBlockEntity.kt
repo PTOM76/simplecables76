@@ -50,27 +50,27 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
         val tiles = network.tiles
 
         // 供給元/消費先
-        val sources = (cables + tiles).filter { it.energy > 0 && it.maxOutput > 0 }
-        val sinks = (cables + tiles).filter { it.energy < it.maxEnergy && it.maxInput > 0 }
+        val sources = (cables + tiles).filter { (_, storage) -> storage.energy > 0 && storage.maxOutput > 0 }
+        val sinks = (cables + tiles).filter { (_, storage) -> storage.energy < storage.maxEnergy && storage.maxInput > 0 }
 
         // 分配アルゴリズム
-        val totalEnergy = sources.sumOf { it.energy }
-        val totalCapacity = sinks.sumOf { it.maxEnergy - it.energy }
+        val totalEnergy = sources.sumOf { it.second.energy }
+        val totalCapacity = sinks.sumOf { it.second.maxEnergy - it.second.energy }
         val transfer = minOf(totalEnergy, totalCapacity)
         if (transfer > 0 && sinks.isNotEmpty()) {
             var remaining = transfer
             for (sink in sinks) {
                 if (remaining <= 0) break
-                val canInsert = minOf(sink.maxInput, sink.maxEnergy - sink.energy, remaining)
+                val canInsert = minOf(sink.second.maxInput, sink.second.maxEnergy - sink.second.energy, remaining)
                 if (canInsert > 0) {
                     // 供給元からエネルギーを減らし、消費先に加算
                     var toInsert = canInsert
                     for (source in sources) {
                         if (toInsert <= 0) break
-                        val take = minOf(source.energy, source.maxOutput, toInsert)
+                        val take = minOf(source.second.energy, source.second.maxOutput, toInsert)
                         if (take > 0) {
-                            source.energy -= take
-                            sink.energy += take
+                            source.second.energy -= take
+                            sink.second.energy += take
                             toInsert -= take
                             remaining -= take
                         }

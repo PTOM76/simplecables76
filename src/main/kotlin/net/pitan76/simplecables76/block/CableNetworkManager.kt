@@ -1,10 +1,16 @@
 package net.pitan76.simplecables76.block
 
+import net.minecraft.world.level.block.entity.BlockEntity
 import java.util.UUID
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.util.math.Vector3i
 import net.pitan76.mcpitanlib.midohra.world.World
+import net.pitan76.simplecables76.compat.EnergyStorageWrapper
+import net.pitan76.simplecables76.compat.IEnergyStorage
+import net.pitan76.simplecables76.compat.TREnergyStorage
+import team.reborn.energy.api.EnergyStorage
+import team.reborn.energy.api.EnergyStorageUtil
 
 /**
  * ケーブルネットワーク全体を管理する、キャッシュ機構つき
@@ -27,8 +33,8 @@ object CableNetworkManager {
      */
     data class CableNetwork(
         val id: UUID,
-        val cables: MutableSet<EnergyCableBlockEntity> = mutableSetOf(),
-        val tiles: MutableSet<BaseEnergyTile> = mutableSetOf()
+        val cables: MutableSet<Pair<EnergyCableBlockEntity, IEnergyStorage>> = mutableSetOf(),
+        val tiles: MutableSet<Pair<BlockEntity, IEnergyStorage>> = mutableSetOf()
     )
 
     /**
@@ -53,22 +59,33 @@ object CableNetworkManager {
     fun searchNetwork(world: World, startPos: BlockPos): CableNetwork {
         val visited = mutableSetOf<BlockPos>()
         val queue = ArrayDeque<BlockPos>()
-        val cables = mutableSetOf<EnergyCableBlockEntity>()
-        val tiles = mutableSetOf<BaseEnergyTile>()
+        val cables = mutableSetOf<Pair<EnergyCableBlockEntity, IEnergyStorage>>()
+        val tiles = mutableSetOf<Pair<BlockEntity, IEnergyStorage>>()
+
         queue.add(startPos)
+
         while (queue.isNotEmpty()) {
             val currentPos = queue.removeFirst()
             if (!visited.add(currentPos)) continue
             val tile = world.getBlockEntity(currentPos).get()
             if (tile is EnergyCableBlockEntity) {
-                cables.add(tile)
+                if (tile.getEnergyStorage() == null) continue
+                cables.add(tile to tile.getEnergyStorage()!!)
+
                 for (dir in listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)) {
                     val neighborPos = currentPos.offset(dir)
                     val neighborTile = world.getBlockEntity(neighborPos).get()
-                    if (neighborTile is EnergyCableBlockEntity && neighborTile !in cables) {
-                        queue.add(neighborPos)
-                    } else if (neighborTile is BaseEnergyTile && neighborTile !is EnergyCableBlockEntity) {
-                        tiles.add(neighborTile)
+                    if (neighborTile is EnergyCableBlockEntity) {
+                        if (cables.none { it.first == neighborTile })
+                            queue.add(neighborPos)
+                    } else {
+                        if (tile.getEnergyStorage() is TREnergyStorage) {
+                            EnergyStorage.SIDED.find(world.raw, neighborPos.toRaw(), dir.opposite.raw)?.let { storage ->
+                                tiles.add(neighborTile to EnergyStorageWrapper(storage))
+                            }
+                        } else if (neighborTile is BaseEnergyTile) {
+                                tiles.add(neighborTile to neighborTile.getEnergyStorage()!!)
+                        }
                     }
                 }
             }
@@ -76,17 +93,17 @@ object CableNetworkManager {
 
         val newId = UUID.randomUUID() // 新しいネットワークIDを生成
 
-        // 既存ネットワークからケーブルを削除
-        cables.forEach { cable ->
+        // 既存ネットワークからケーブルを削除 (旧)
+        cables.forEach { (cable, storage) ->
             cable.networkId.let { oldId ->
                 if (oldId != newId) {
-                    networkMap[oldId]?.cables?.remove(cable)
+                    networkMap[oldId]?.cables?.remove(cable to storage)
                 }
             }
         }
 
         // ケーブルに新ネットワークIDを付与し、マップを更新
-        cables.forEach { cable ->
+        cables.forEach { (cable, storage) ->
             cable.networkId = newId
             val cablePos = BlockPos.of(cable.callGetPos())
             cablePosToNetworkId[getWorldId(world) to Vector3i.of(cablePos)] = newId

@@ -54,6 +54,21 @@ class TREnergyStorage(val tile: BaseEnergyTile) : SnapshotParticipant<Long?>(), 
         tile.energy = snapshot
     }
 
+    override val maxOutput: Long
+        get() = tile.maxOutput
+
+    override val maxInput: Long
+        get() = tile.maxInput
+
+    override val maxEnergy: Long
+        get() = capacity
+
+    override var energy: Long
+        get() = tile.energy
+        set(value) {
+            tile.energy = value
+        }
+
     companion object {
         val CONVERSION_RATE: Double = Config.rebornEnergyConversionRate
     }
