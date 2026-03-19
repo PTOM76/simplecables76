@@ -1,8 +1,8 @@
 package net.pitan76.simplecables76.block
 
+import java.util.UUID
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.core.BlockPos
-import net.pitan76.mcpitanlib.midohra.util.math.BlockPos as BlockPosM
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.pitan76.mcpitanlib.api.event.block.TileCreateEvent
@@ -11,7 +11,6 @@ import net.pitan76.mcpitanlib.api.event.nbt.WriteNbtArgs
 import net.pitan76.mcpitanlib.api.event.tile.TileTickEvent
 import net.pitan76.mcpitanlib.api.tile.ExtendBlockEntityTicker
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
-import net.pitan76.mcpitanlib.midohra.world.World
 import net.pitan76.simplecables76.compat.TREnergyStorage
 import team.reborn.energy.api.EnergyStorage
 
@@ -29,6 +28,8 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
     override val maxInput: Long
         get() = 64
 
+    var networkId: UUID = UUID.randomUUID()
+
     override fun writeNbt(args: WriteNbtArgs) {
         super.writeNbt(args)
     }
@@ -38,11 +39,15 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
     }
 
     override fun tick(e: TileTickEvent<EnergyCableBlockEntity>) {
+        if (e.isClient) return
+
         val world = e.midohraWorld
         val pos = e.midohraPos
 
-        // ネットワーク探索 (TechRebornを参考)
-        val (cables, tiles) = findNetwork(pos, world)
+        // CableNetworkManagerでネットワーク取得
+        val network = CableNetworkManager.getOrCreateNetwork(world, pos)
+        val cables = network.cables
+        val tiles = network.tiles
 
         // 供給元/消費先
         val sources = (cables + tiles).filter { it.energy > 0 && it.maxOutput > 0 }
@@ -74,7 +79,7 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
             }
         }
 
-        // --- 隣接するEnergyStorageへの転送処理 ---
+        // 隣接するEnergyStorageへの転送処理
         for (dir in listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)) {
             val neighborPos = pos.offset(dir)
             val neighborBe = world.getBlockEntity(neighborPos).get()
@@ -93,34 +98,6 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
                     }
                 }
             }
-        }
-    }
-
-    companion object {
-        fun findNetwork(startPos: BlockPosM, world: World): Pair<Set<EnergyCableBlockEntity>, Set<BaseEnergyTile>> {
-            val visited = mutableSetOf<BlockPosM>()
-            val queue = ArrayDeque<BlockPosM>()
-            val cables = mutableSetOf<EnergyCableBlockEntity>()
-            val tiles = mutableSetOf<BaseEnergyTile>()
-            queue.add(startPos)
-            while (queue.isNotEmpty()) {
-                val currentPos = queue.removeFirst()
-                if (!visited.add(currentPos)) continue
-                val be = world.getBlockEntity(currentPos).get()
-                if (be is EnergyCableBlockEntity) {
-                    cables.add(be)
-                    for (dir in listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)) {
-                        val neighborPos = currentPos.offset(dir)
-                        val neighborBe = world.getBlockEntity(neighborPos).get()
-                        if (neighborBe is EnergyCableBlockEntity && neighborBe !in cables) {
-                            queue.add(neighborPos)
-                        } else if (neighborBe is BaseEnergyTile && neighborBe !is EnergyCableBlockEntity) {
-                            tiles.add(neighborBe)
-                        }
-                    }
-                }
-            }
-            return Pair(cables, tiles)
         }
     }
 }
