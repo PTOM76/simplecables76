@@ -6,14 +6,15 @@ import team.reborn.energy.api.EnergyStorage
 
 object RebornEnergyRegister {
     fun init() {
+        println("Registering Reborn Energy Storage for Energy Cable")
         EnergyStorage.SIDED.registerForBlockEntity({ blockEntity, _ ->
-            if (blockEntity !is BaseEnergyTile) return@registerForBlockEntity null
+            if (blockEntity is BaseEnergyTile) {
+                if (blockEntity.getEnergyStorage() is TREnergyStorage)
+                    return@registerForBlockEntity blockEntity.getEnergyStorage() as TREnergyStorage
 
-            if (!blockEntity.hasEnergyStorage())
-                blockEntity.setEnergyStorage(TREnergyStorage(blockEntity))
-
-            if (blockEntity.getEnergyStorage() is TREnergyStorage)
-                return@registerForBlockEntity blockEntity.getEnergyStorage() as TREnergyStorage
+                if (!blockEntity.hasEnergyStorage())
+                    blockEntity.setEnergyStorage(TREnergyStorage(blockEntity))
+            }
 
             return@registerForBlockEntity null
         }, BlockEntities.ENERGY_CABLE.get())

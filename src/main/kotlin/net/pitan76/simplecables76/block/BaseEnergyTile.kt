@@ -11,7 +11,7 @@ import net.pitan76.mcpitanlib.api.tile.ExtendBlockEntityTicker
 import net.pitan76.mcpitanlib.api.util.nbt.v2.NbtRWUtil
 import net.pitan76.simplecables76.compat.IEnergyStorage
 
-abstract class BaseEnergyTile : CompatBlockEntity, ExtendBlockEntityTicker<BaseEnergyTile> {
+abstract class BaseEnergyTile : CompatBlockEntity {
 
     constructor(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) : super(type, pos, state)
 

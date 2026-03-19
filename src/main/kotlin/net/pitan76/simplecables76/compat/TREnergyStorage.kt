@@ -6,11 +6,7 @@ import net.pitan76.simplecables76.Config
 import net.pitan76.simplecables76.block.BaseEnergyTile
 import team.reborn.energy.api.EnergyStorage
 
-class TREnergyStorage(private val tile: BaseEnergyTile) : SnapshotParticipant<Long?>(), EnergyStorage, IEnergyStorage {
-
-    fun getTile(): BaseEnergyTile {
-        return tile
-    }
+class TREnergyStorage(val tile: BaseEnergyTile) : SnapshotParticipant<Long?>(), EnergyStorage, IEnergyStorage {
 
     val usableCapacity: Long
         get() = (tile.usableCapacity / CONVERSION_RATE).toLong()

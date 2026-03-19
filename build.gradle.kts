@@ -45,6 +45,10 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
     modImplementation("net.pitan76:mcpitanlib-fabric-${project.property("mcpitanlib_version")}")
 
+    // TRのエネルギー用
+    modImplementation("RebornCore:RebornCore-1.20:5.10.3")
+    modImplementation("TechReborn:TechReborn-1.20:5.10.3")
+
     modImplementation("teamreborn:energy:${project.property("tr_energy_version")}")
 }
 

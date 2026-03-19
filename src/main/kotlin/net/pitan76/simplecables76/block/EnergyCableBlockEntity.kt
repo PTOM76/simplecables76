@@ -31,25 +31,4 @@ class EnergyCableBlockEntity : BaseEnergyTile {
     override fun readNbt(args: ReadNbtArgs) {
         super.readNbt(args)
     }
-
-    override fun tick(e: TileTickEvent<BaseEnergyTile>) {
-//        val world: World? = e.midohraWorld
-//        val pos = e.midohraPos
-//        if (world == null) return
-//
-//        if (this.energy > 0) {
-//            val dirs = listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)
-//            for (dir in dirs) {
-//                val neighborPos = pos.offset(dir)
-//                val neighborBlockEntity = world.getBlockEntity(neighborPos)
-//                if (neighborBlockEntity is BaseEnergyTile) {
-//                    val energyToTransfer = minOf(this.energy, this.maxOutput)
-//                    if (energyToTransfer > 0) {
-//                        val inserted = neighborBlockEntity.insertEnergy(energyToTransfer);
-//                    }
-//                }
-//            }
-//        }
-
-    }
 }
