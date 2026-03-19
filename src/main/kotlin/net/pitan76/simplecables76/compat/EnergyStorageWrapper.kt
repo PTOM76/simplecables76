@@ -1,6 +1,8 @@
 package net.pitan76.simplecables76.compat
 
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import team.reborn.energy.api.EnergyStorage
+import kotlin.use
 
 class EnergyStorageWrapper(var energyStorage: EnergyStorage) : IEnergyStorage {
 
@@ -18,9 +20,19 @@ class EnergyStorageWrapper(var energyStorage: EnergyStorage) : IEnergyStorage {
         set(value) {
             val delta = value - energyStorage.amount
             if (delta > 0) {
-                energyStorage.insert(delta, null)
+                Transaction.openOuter().use { transaction ->
+                    val inserted = energyStorage.insert(delta, transaction)
+                    if (inserted > 0) {
+                        transaction.commit()
+                    }
+                }
             } else if (delta < 0) {
-                energyStorage.extract(-delta, null)
+                Transaction.openOuter().use { transaction ->
+                    val extracted = energyStorage.extract(-delta, transaction)
+                    if (extracted > 0) {
+                        transaction.commit()
+                    }
+                }
             }
         }
 }

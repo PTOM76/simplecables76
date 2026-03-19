@@ -89,6 +89,12 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
 
     // NORTH, SOUTH, EAST, WEST, UP, DOWNのプロパティを更新するための関数
     fun updateConnections(world: World, pos: BlockPos, tile: EnergyCableBlockEntity) {
+        if (!world.getBlockState(pos).contains(CompatProperties.UP) || !world.getBlockState(pos).contains(CompatProperties.DOWN) ||
+            !world.getBlockState(pos).contains(CompatProperties.NORTH) || !world.getBlockState(pos).contains(CompatProperties.SOUTH) ||
+            !world.getBlockState(pos).contains(CompatProperties.WEST) || !world.getBlockState(pos).contains(CompatProperties.EAST)) {
+            return
+        }
+
         for (dir in listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)) {
             val neighborPos = pos.offset(dir)
             val neighborTile = world.getBlockEntity(neighborPos).get()
@@ -116,7 +122,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
                 continue
             }
 
-            if (tile.getEnergyStorage() is TREnergyStorage) {
+//            if (tile.getEnergyStorage() is TREnergyStorage) {
                 EnergyStorage.SIDED.find(world.raw, neighborPos.toRaw(), dir.opposite.raw)?.let { storage ->
                     when (dir) {
                         Direction.UP -> {
@@ -144,7 +150,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
                         }
                     }
                     continue
-                }
+//                }
             }
 
             if (neighborTile is BaseEnergyTile) {
