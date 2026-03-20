@@ -18,6 +18,7 @@ import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.world.World
 import team.reborn.energy.api.EnergyStorage
+import techreborn.blocks.cable.CableBlock
 
 class EnergyCable : AbstractCable, CompatWaterloggable {
 
@@ -150,6 +151,10 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
     }
 
     override fun getFluidState(args: FluidStateArgs?): FluidState? {
+        if (args != null && CompatProperties.WATERLOGGED.get(args.state)) {
+            return FluidUtil.getStillWater()
+        }
+
         return super.getFluidState(args)
     }
 
