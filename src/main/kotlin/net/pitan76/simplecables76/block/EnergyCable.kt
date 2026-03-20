@@ -22,7 +22,7 @@ import team.reborn.energy.api.EnergyStorage
 class EnergyCable : AbstractCable, CompatWaterloggable {
 
     constructor(settings: CompatibleBlockSettings) : super(settings) {
-        setDefaultState(DirectionBoolPropertyUtil.clearAll(defaultMidohraState))
+        setDefaultState(DirectionBoolPropertyUtil.clearAll(defaultMidohraState).with(CompatProperties.WATERLOGGED, false))
     }
 
     override fun getOutlineShape(e: OutlineShapeEvent): VoxelShape {
