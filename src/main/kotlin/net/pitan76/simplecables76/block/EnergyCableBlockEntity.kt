@@ -25,15 +25,8 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
     override val maxInput: Long
         get() = 256
 
+    // キャッシュ用のネットワークID。CableNetworkManagerで管理する
     var networkId: UUID = UUID.randomUUID()
-
-    override fun writeNbt(args: WriteNbtArgs) {
-        super.writeNbt(args)
-    }
-
-    override fun readNbt(args: ReadNbtArgs) {
-        super.readNbt(args)
-    }
 
     override fun tick(e: TileTickEvent<EnergyCableBlockEntity>) {
         if (e.isClient) return
@@ -120,5 +113,13 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
                 }
             }
         }
+    }
+
+    override fun writeNbt(args: WriteNbtArgs) {
+        super.writeNbt(args)
+    }
+
+    override fun readNbt(args: ReadNbtArgs) {
+        super.readNbt(args)
     }
 }
