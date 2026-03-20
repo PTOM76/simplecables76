@@ -70,6 +70,8 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
         // タイル供給元(発電機など)からケーブルに
         val tileProviders = tiles.filter { (_, storage) -> storage.energy > 0 && storage.canOutput }
         for ((_, tileStorage) in tileProviders) {
+            if (!tileStorage.canOutput) continue
+
             val totalCableCapacity = cables.sumOf { (_, s) -> s.maxEnergy - s.energy }
             if (totalCableCapacity <= 0) break
 
