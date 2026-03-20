@@ -91,7 +91,7 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
             val neighborBe = world.getBlockEntity(neighborPos).get()
             if (neighborBe !is BaseEnergyTile) {
                 val storage = BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)
-                if (storage != null && storage !is TREnergyStorage) {
+                if (storage != null && storage !is TREnergyStorage && storage.supportsInsertion()) {
                     val sendAmount = minOf(this.maxOutput, this.energy)
                     if (sendAmount > 0) {
                         Transaction.openOuter().use { transaction ->
