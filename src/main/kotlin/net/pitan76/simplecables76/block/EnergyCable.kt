@@ -1,38 +1,28 @@
 package net.pitan76.simplecables76.block
 
+import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.pitan76.mcpitanlib.api.block.CompatBlockRenderType
 import net.pitan76.mcpitanlib.api.block.CompatWaterloggable
 import net.pitan76.mcpitanlib.api.block.args.RenderTypeArgs
 import net.pitan76.mcpitanlib.api.block.args.v2.OutlineShapeEvent
+import net.pitan76.mcpitanlib.api.block.args.v2.PlacementStateArgs
 import net.pitan76.mcpitanlib.api.block.v2.CompatibleBlockSettings
-import net.pitan76.mcpitanlib.api.event.block.AppendPropertiesArgs
-import net.pitan76.mcpitanlib.api.event.block.BlockPlacedEvent
-import net.pitan76.mcpitanlib.api.event.block.BlockUseEvent
-import net.pitan76.mcpitanlib.api.event.block.StateReplacedEvent
-import net.pitan76.mcpitanlib.api.event.block.TileCreateEvent
+import net.pitan76.mcpitanlib.api.event.block.*
+import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.api.state.property.CompatProperties
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
-import net.pitan76.mcpitanlib.api.util.CompatActionResult
-import net.pitan76.mcpitanlib.api.util.TextUtil
-import net.pitan76.mcpitanlib.api.util.VoxelShapeUtil
+import net.pitan76.mcpitanlib.api.util.*
+import net.pitan76.mcpitanlib.midohra.fluid.Fluids
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.world.World
-import net.pitan76.simplecables76.compat.TREnergyStorage
 import team.reborn.energy.api.EnergyStorage
 
 class EnergyCable : AbstractCable, CompatWaterloggable {
 
     constructor(settings: CompatibleBlockSettings) : super(settings) {
-        setDefaultState(defaultMidohraState
-            .with(CompatProperties.UP, false)
-            .with(CompatProperties.DOWN, false)
-            .with(CompatProperties.NORTH, false)
-            .with(CompatProperties.EAST, false)
-            .with(CompatProperties.SOUTH, false)
-            .with(CompatProperties.WEST, false)
-        )
+        setDefaultState(DirectionBoolPropertyUtil.clearAll(defaultMidohraState))
     }
 
     override fun getOutlineShape(e: OutlineShapeEvent): VoxelShape {
@@ -80,7 +70,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
         val blockEntity = e.blockEntity
         if (blockEntity is BaseEnergyTile) {
             if (e.isClient) return CompatActionResult.SUCCESS
-            e.player.sendMessage(TextUtil.of("Energy: ${blockEntity.energy} / ${blockEntity.maxEnergy}"))
+            e.player.sendMessage("Energy: ${blockEntity.energy} / ${blockEntity.maxEnergy}")
         }
 
         return super.onRightClick(e)
@@ -89,124 +79,29 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
 
     // NORTH, SOUTH, EAST, WEST, UP, DOWNのプロパティを更新するための関数
     fun updateConnections(world: World, pos: BlockPos, tile: EnergyCableBlockEntity) {
-        if (!world.getBlockState(pos).contains(CompatProperties.UP) || !world.getBlockState(pos).contains(CompatProperties.DOWN) ||
-            !world.getBlockState(pos).contains(CompatProperties.NORTH) || !world.getBlockState(pos).contains(CompatProperties.SOUTH) ||
-            !world.getBlockState(pos).contains(CompatProperties.WEST) || !world.getBlockState(pos).contains(CompatProperties.EAST)) {
-            return
-        }
+        if (!DirectionBoolPropertyUtil.hasAll(world.getBlockState(pos))) return
 
-        for (dir in listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)) {
+        for (dir in Direction.values()) {
             val neighborPos = pos.offset(dir)
             val neighborTile = world.getBlockEntity(neighborPos).get()
             if (neighborTile is EnergyCableBlockEntity) {
-                when (dir) {
-                    Direction.UP -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.UP, true))
-                    }
-                    Direction.DOWN -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.DOWN, true))
-                    }
-                    Direction.NORTH -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.NORTH, true))
-                    }
-                    Direction.SOUTH -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.SOUTH, true))
-                    }
-                    Direction.WEST -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.WEST, true))
-                    }
-                    Direction.EAST -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.EAST, true))
-                    }
-                }
+                DirectionBoolPropertyUtil.setProperty(world, pos, dir, true)
                 continue
             }
 
 //            if (tile.getEnergyStorage() is TREnergyStorage) {
-                EnergyStorage.SIDED.find(world.raw, neighborPos.toRaw(), dir.opposite.raw)?.let { storage ->
-                    when (dir) {
-                        Direction.UP -> {
-                            world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.UP, true))
-                        }
-
-                        Direction.DOWN -> {
-                            world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.DOWN, true))
-                        }
-
-                        Direction.NORTH -> {
-                            world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.NORTH, true))
-                        }
-
-                        Direction.SOUTH -> {
-                            world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.SOUTH, true))
-                        }
-
-                        Direction.WEST -> {
-                            world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.WEST, true))
-                        }
-
-                        Direction.EAST -> {
-                            world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.EAST, true))
-                        }
-                    }
-                    continue
-//                }
+            BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)?.let { _ ->
+                DirectionBoolPropertyUtil.setProperty(world, pos, dir, true)
+                continue
             }
+//            }
 
             if (neighborTile is BaseEnergyTile) {
-                when (dir) {
-                    Direction.UP -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.UP, true))
-                    }
-
-                    Direction.DOWN -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.DOWN, true))
-                    }
-
-                    Direction.NORTH -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.NORTH, true))
-                    }
-
-                    Direction.SOUTH -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.SOUTH, true))
-                    }
-
-                    Direction.WEST -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.WEST, true))
-                    }
-
-                    Direction.EAST -> {
-                        world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.EAST, true))
-                    }
-                }
+                DirectionBoolPropertyUtil.setProperty(world, pos, dir, true)
                 continue
             }
 
-            when (dir) {
-                Direction.UP -> {
-                    world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.UP, false))
-                }
-
-                Direction.DOWN -> {
-                    world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.DOWN, false))
-                }
-
-                Direction.NORTH -> {
-                    world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.NORTH, false))
-                }
-
-                Direction.SOUTH -> {
-                    world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.SOUTH, false))
-                }
-
-                Direction.WEST -> {
-                    world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.WEST, false))
-                }
-
-                Direction.EAST -> {
-                    world.setBlockState(pos, world.getBlockState(pos).with(CompatProperties.EAST, false))
-                }
-            }
+            DirectionBoolPropertyUtil.setProperty(world, pos, dir, false)
         }
     }
 
@@ -246,11 +141,34 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
 
     override fun appendProperties(args: AppendPropertiesArgs) {
         super.appendProperties(args)
-        args.addProperty(CompatProperties.UP, CompatProperties.DOWN, CompatProperties.NORTH,
-            CompatProperties.EAST, CompatProperties.SOUTH, CompatProperties.WEST)
+        args.addAllDirectionBoolProperties()
+        args.addProperty(CompatProperties.WATERLOGGED)
     }
 
     override fun getRenderType(args: RenderTypeArgs?): CompatBlockRenderType {
         return CompatBlockRenderType.MODEL
+    }
+
+    override fun getFluidState(args: FluidStateArgs?): FluidState? {
+        return super.getFluidState(args)
+    }
+
+    override fun getPlacementState(args: PlacementStateArgs?): net.pitan76.mcpitanlib.midohra.block.BlockState? {
+        if (args != null) {
+            return this.defaultMidohraState.with(CompatProperties.WATERLOGGED,
+                FluidStateUtil.getFluidWrapper(args.world, args.pos) == Fluids.WATER)
+        }
+
+        return super.getPlacementState(args as PlacementStateArgs?)
+    }
+
+    override fun neighborUpdate(e: NeighborUpdateEvent?) {
+        super.neighborUpdate(e)
+        if (e == null) return
+
+        val blockEntity = e.blockEntity
+        if (blockEntity !is EnergyCableBlockEntity) return
+
+        updateConnections(World.of(e.world), BlockPos.of(e.pos), blockEntity)
     }
 }

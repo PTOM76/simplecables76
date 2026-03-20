@@ -9,6 +9,7 @@ import net.pitan76.mcpitanlib.api.event.block.TileCreateEvent
 import net.pitan76.mcpitanlib.api.event.nbt.ReadNbtArgs
 import net.pitan76.mcpitanlib.api.event.nbt.WriteNbtArgs
 import net.pitan76.mcpitanlib.api.event.tile.TileTickEvent
+import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.api.tile.ExtendBlockEntityTicker
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.simplecables76.compat.TREnergyStorage
@@ -80,11 +81,11 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
         }
 
         // 隣接するEnergyStorageへの転送処理
-        for (dir in listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)) {
+        for (dir in Direction.values()) {
             val neighborPos = pos.offset(dir)
             val neighborBe = world.getBlockEntity(neighborPos).get()
             if (neighborBe !is BaseEnergyTile) {
-                val storage = EnergyStorage.SIDED.find(world.toMinecraft(), neighborPos.toMinecraft(), dir.opposite.toMinecraft())
+                val storage = BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)
                 if (storage != null && storage !is TREnergyStorage) {
                     val sendAmount = minOf(this.maxOutput, this.energy)
                     if (sendAmount > 0) {

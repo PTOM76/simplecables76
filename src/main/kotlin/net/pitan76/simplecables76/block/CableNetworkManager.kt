@@ -1,6 +1,7 @@
 package net.pitan76.simplecables76.block
 
 import net.minecraft.world.level.block.entity.BlockEntity
+import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import java.util.UUID
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
@@ -10,7 +11,6 @@ import net.pitan76.simplecables76.compat.EnergyStorageWrapper
 import net.pitan76.simplecables76.compat.IEnergyStorage
 import net.pitan76.simplecables76.compat.TREnergyStorage
 import team.reborn.energy.api.EnergyStorage
-import team.reborn.energy.api.EnergyStorageUtil
 
 /**
  * ケーブルネットワーク全体を管理する、キャッシュ機構つき
@@ -72,7 +72,7 @@ object CableNetworkManager {
                 if (tile.getEnergyStorage() == null) continue
                 cables.add(tile to tile.getEnergyStorage()!!)
 
-                for (dir in listOf(Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)) {
+                for (dir in Direction.values()) {
                     val neighborPos = currentPos.offset(dir)
                     val neighborTile = world.getBlockEntity(neighborPos).get()
                     if (neighborTile is EnergyCableBlockEntity) {
@@ -80,7 +80,7 @@ object CableNetworkManager {
                             queue.add(neighborPos)
                     } else {
                         if (tile.getEnergyStorage() is TREnergyStorage) {
-                            EnergyStorage.SIDED.find(world.raw, neighborPos.toRaw(), dir.opposite.raw)?.let { storage ->
+                            BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)?.let { storage ->
                                 tiles.add(neighborTile to EnergyStorageWrapper(storage))
                             }
                         } else if (neighborTile is BaseEnergyTile) {
