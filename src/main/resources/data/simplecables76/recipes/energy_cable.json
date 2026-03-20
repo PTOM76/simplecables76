@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OOO",
+    "###",
+    "OOO"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:copper_ingot"
+    },
+    "O": {
+      "item": "minecraft:stone"
+    }
+  },
+  "result": {
+    "item": "simplecables76:energy_cable",
+    "count": 8
+  }
+}
