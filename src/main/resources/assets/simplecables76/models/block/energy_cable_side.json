@@ -1,4 +1,5 @@
 {
+  "parent": "minecraft:block/block",
   "textures": {
     "particle": "simplecables76:block/energy_cable",
     "cable": "simplecables76:block/energy_cable"
@@ -8,12 +9,12 @@
       "from": [5, 5, 0],
       "to": [11, 11, 5],
       "faces": {
-        "north": {"uv": [5, 6, 11, 12], "texture": "#cable", "cullface": "north"},
-        "south": {"uv": [5, 6, 11, 12], "texture": "#cable"},
-        "east": {"uv": [0, 6, 5, 12], "texture": "#cable"},
+        "north": {"uv": [0, 0, 6, 6], "texture": "#cable", "cullface": "north"},
+        "south": {"uv": [0, 0, 6, 6], "texture": "#cable"},
+        "east": {"uv": [0, 6, 5, 12], "rotation": 180, "texture": "#cable"},
         "west": {"uv": [0, 6, 5, 12], "texture": "#cable"},
-        "up": {"uv": [0, 6, 6, 12], "rotation": 90, "texture": "#cable"},
-        "down": {"uv": [5, 6, 11, 12], "rotation": 90, "texture": "#cable"}
+        "up": {"uv": [0, 6, 5, 12], "rotation": 90, "texture": "#cable"},
+        "down": {"uv": [0, 6, 5, 12], "rotation": 270, "texture": "#cable"}
       }
     }
   ]
