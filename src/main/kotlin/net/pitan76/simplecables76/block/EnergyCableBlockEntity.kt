@@ -53,52 +53,93 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
         val cables = network.cables
         val tiles = network.tiles
 
-        // 供給元/消費先
-        val sources = (cables + tiles).filter { (_, storage) -> storage.energy > 0 && storage.maxOutput > 0 }
-        val sinks = (cables + tiles)
-            .filter { (_, storage) -> storage.energy < storage.maxEnergy && storage.maxInput > 0 }
-            .filterNot { it.first in sources.map { s -> s.first } }
+        // ケーブル間のエネルギー均等化
+        val totalCableEnergy = cables.sumOf { it.second.energy }
+        if (cables.isNotEmpty() && totalCableEnergy > 0) {
+            val perCable = totalCableEnergy / cables.size
+            val remainder = totalCableEnergy % cables.size
+            var i = 0
+            for ((_, storage) in cables) {
+                storage.energy = perCable + if (i < remainder) 1 else 0
+                i++
+            }
+        }
 
-        // 分配アルゴリズム
-        val totalEnergy = sources.sumOf { it.second.energy }
-        val totalCapacity = sinks.sumOf { it.second.maxEnergy - it.second.energy }
-        val transfer = minOf(totalEnergy, totalCapacity)
-        if (transfer > 0 && sinks.isNotEmpty()) {
-            var remaining = transfer
-            for (sink in sinks) {
-                if (remaining <= 0) break
-                val canInsert = minOf(sink.second.maxInput, sink.second.maxEnergy - sink.second.energy, remaining)
-                if (canInsert > 0) {
-                    // 供給元からエネルギーを減らし、消費先に加算
-                    var toInsert = canInsert
-                    for (source in sources) {
-                        if (toInsert <= 0) break
-                        val take = minOf(source.second.energy, source.second.maxOutput, toInsert)
+        // タイル供給元(発電機など)からケーブルに
+        val tileProviders = tiles.filter { (_, storage) -> storage.energy > 0 && storage.canOutput }
+        for ((_, tileStorage) in tileProviders) {
+            val totalCableCapacity = cables.sumOf { (_, s) -> s.maxEnergy - s.energy }
+            if (totalCableCapacity <= 0) break
+
+            val takeAmount = minOf(tileStorage.energy, totalCableCapacity)
+            if (takeAmount > 0) {
+                val extracted = tileStorage.extract(takeAmount)
+                if (extracted > 0) {
+                    // 吸収したエネルギーをケーブルに分配
+                    var rem = extracted
+                    for ((_, cableStorage) in cables) {
+                        if (rem <= 0) break
+                        val space = cableStorage.maxEnergy - cableStorage.energy
+                        val give = minOf(space, rem)
+                        cableStorage.energy += give
+                        rem -= give
+                    }
+                }
+            }
+        }
+
+        // ケーブルからタイル消費先(装置など)へ
+        val tileConsumers = tiles.filter { (_, storage) ->
+            storage.energy < storage.maxEnergy && storage.canInput
+        }.filterNot { it in tileProviders }
+
+        for ((_, tileStorage) in tileConsumers) {
+            val capacity = tileStorage.maxEnergy - tileStorage.energy
+            if (capacity <= 0) continue
+
+            // ケーブルから出力可能な合計量を計算
+            var available: Long = 0
+            for ((cable, cableStorage) in cables) {
+                available += minOf(cableStorage.energy, cable.maxOutput)
+            }
+            val pushAmount = minOf(capacity, available)
+            if (pushAmount > 0) {
+                val inserted = tileStorage.insert(pushAmount)
+                if (inserted > 0) {
+                    // 挿入分をケーブルから引く
+                    var rem = inserted
+                    for ((cable, cableStorage) in cables) {
+                        if (rem <= 0) break
+                        val take = minOf(cableStorage.energy, cable.maxOutput, rem)
                         if (take > 0) {
-                            source.second.energy -= take
-                            sink.second.energy += take
-                            toInsert -= take
-                            remaining -= take
+                            cableStorage.energy -= take
+                            rem -= take
                         }
                     }
                 }
             }
         }
 
-        // 隣接するEnergyStorageへの転送処理
-        for (dir in Direction.values()) {
-            val neighborPos = pos.offset(dir)
-            val neighborBe = world.getBlockEntity(neighborPos).get()
-            if (neighborBe !is BaseEnergyTile) {
-                val storage = BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)
-                if (storage != null && storage !is TREnergyStorage && storage.supportsInsertion()) {
-                    val sendAmount = minOf(this.maxOutput, this.energy)
-                    if (sendAmount > 0) {
-                        Transaction.openOuter().use { transaction ->
-                            val inserted = storage.insert(sendAmount, transaction)
-                            if (inserted > 0) {
-                                transaction.commit()
-                                this.energy -= inserted.toInt()
+//         ネットワーク外の隣接EnergyStorageへ
+        for ((cable, cableStorage) in cables) {
+            val cablePos = net.pitan76.mcpitanlib.midohra.util.math.BlockPos.of(cable.callGetPos())
+            for (dir in Direction.values()) {
+                val neighborPos = cablePos.offset(dir)
+                val neighborBe = world.getBlockEntity(neighborPos).get()
+                if (neighborBe !is EnergyCableBlockEntity) {
+                    // ネットワーク内タイルはステップ2,3で処理済み
+                    if (tiles.any { it.first === neighborBe }) continue
+
+                    val storage = BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)
+                    if (storage != null && storage !is TREnergyStorage && storage.supportsInsertion()) {
+                        val sendAmount = minOf(cable.maxOutput, cableStorage.energy)
+                        if (sendAmount > 0) {
+                            Transaction.openOuter().use { transaction ->
+                                val inserted = storage.insert(sendAmount, transaction)
+                                if (inserted > 0) {
+                                    transaction.commit()
+                                    cableStorage.energy -= inserted
+                                }
                             }
                         }
                     }

@@ -132,6 +132,22 @@ object CableNetworkManager {
         }
     }
 
+    fun printLog(world: World, pos: BlockPos) {
+        val network = getOrCreateNetwork(world, pos)
+
+        println("Cable Network ID: ${network.id}")
+        println("Cables (${network.cables.size}):")
+        network.cables.forEach { (cable, storage) ->
+            println("- ${cable.callGetPos()}: ${storage.energy}/${storage.maxEnergy}")
+        }
+        println("Tiles (${network.tiles.size}):")
+        network.tiles.forEach { (tile, storage) ->
+            println("- ${tile.blockPos}: ${storage.energy}/${storage.maxEnergy}")
+        }
+
+        println()
+    }
+
     /**
      * ネットワークIDからネットワークを取得
      */

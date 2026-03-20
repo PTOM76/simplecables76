@@ -111,6 +111,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
     override fun onStateReplaced(e: StateReplacedEvent) {
         if (!e.isClient) {
             CableNetworkManager.onCableChanged(e.midohraWorld, e.midohraPos)
+            CableNetworkManager.printLog(e.midohraWorld, e.midohraPos)
         }
 
         val cable = e.blockEntity as? EnergyCableBlockEntity
@@ -124,6 +125,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
     override fun onPlaced(e: BlockPlacedEvent) {
         if (!e.isClient) {
             CableNetworkManager.onCableChanged(e.midohraWorld, e.midohraPos)
+            CableNetworkManager.printLog(e.midohraWorld, e.midohraPos)
         }
 
         val cable = e.blockEntity as? EnergyCableBlockEntity
