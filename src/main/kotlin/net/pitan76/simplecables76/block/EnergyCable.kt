@@ -169,6 +169,6 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
         val blockEntity = e.blockEntity
         if (blockEntity !is EnergyCableBlockEntity) return
 
-        updateConnections(World.of(e.world), BlockPos.of(e.pos), blockEntity)
+        updateConnections(e.midohraWorld, e.midohraPos, blockEntity)
     }
 }
