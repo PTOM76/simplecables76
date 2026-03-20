@@ -93,7 +93,7 @@ object CableNetworkManager {
 
         val newId = UUID.randomUUID() // 新しいネットワークIDを生成
 
-        // 既存ネットワークからケーブルを削除 (旧)
+        // 既存ネットワークからケーブルを削除
         cables.forEach { (cable, storage) ->
             cable.networkId.let { oldId ->
                 if (oldId != newId) {
@@ -103,7 +103,7 @@ object CableNetworkManager {
         }
 
         // ケーブルに新ネットワークIDを付与し、マップを更新
-        cables.forEach { (cable, storage) ->
+        cables.forEach { (cable, _) ->
             cable.networkId = newId
             val cablePos = BlockPos.of(cable.callGetPos())
             cablePosToNetworkId[getWorldId(world) to Vector3i.of(cablePos)] = newId
