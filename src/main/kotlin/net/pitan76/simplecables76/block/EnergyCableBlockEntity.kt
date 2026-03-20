@@ -1,7 +1,6 @@
 package net.pitan76.simplecables76.block
 
 import java.util.UUID
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
@@ -9,14 +8,8 @@ import net.pitan76.mcpitanlib.api.event.block.TileCreateEvent
 import net.pitan76.mcpitanlib.api.event.nbt.ReadNbtArgs
 import net.pitan76.mcpitanlib.api.event.nbt.WriteNbtArgs
 import net.pitan76.mcpitanlib.api.event.tile.TileTickEvent
-import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.api.tile.ExtendBlockEntityTicker
-import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.simplecables76.CableNetworkManager
-import net.pitan76.simplecables76.compat.TREnergyStorage
-import team.reborn.energy.api.EnergyStorage
-import techreborn.blockentity.cable.CableBlockEntity
-import techreborn.blocks.cable.CableBlock
 
 class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCableBlockEntity> {
     constructor(type: BlockEntityType<*>, e: TileCreateEvent) : super(type, e)
@@ -54,6 +47,7 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
 
         val cables = network.cables
         val tiles = network.tiles
+        if (tiles.isEmpty()) return
 
         // ケーブル間のエネルギー均等化
         val totalCableEnergy = cables.sumOf { it.second.energy }
@@ -67,36 +61,39 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
             }
         }
 
-        // タイル供給元(発電機など)からケーブルに
-        val tileProviders = tiles.filter { (_, storage) -> storage.energy > 0 && storage.canOutput }
-       for ((_, tileStorage) in tileProviders) {
-           val totalCableCapacity = cables.sumOf { (_, s) -> s.maxEnergy - s.energy }
-           if (totalCableCapacity <= 0) break
+        // 発電機など(供給装置) -> ケーブル
+        // EnergyStorageに登録しているが、modによっては引き出せないことがあるので一応、実装しておく
+        val providers = tiles.filter { (_, storage) -> storage.energy > 0 && storage.canOutput }
+        for ((_, storage) in providers) {
+            val totalCapacity = cables.sumOf { (_, s) -> s.maxEnergy - s.energy }
+            if (totalCapacity <= 0) break
 
-           val takeAmount = minOf(tileStorage.energy, totalCableCapacity)
-           if (takeAmount > 0) {
-               val extracted = tileStorage.extract(takeAmount)
-               if (extracted > 0) {
-                   // 吸収したエネルギーをケーブルに分配
-                   var rem = extracted
-                   for ((_, cableStorage) in cables) {
-                       if (rem <= 0) break
-                       val space = cableStorage.maxEnergy - cableStorage.energy
-                       val give = minOf(space, rem)
-                       cableStorage.energy += give
-                       rem -= give
-                   }
-               }
-           }
+            // 発電機から出力可能な量とケーブルの空き容量の両方を考慮して、実際に引き出す量を決定
+            val takeAmount = minOf(storage.energy, totalCapacity)
+            if (takeAmount <= 0) continue
+
+            // 発電機からエネルギーを引き出して0より大きい場合はケーブルに分配
+            val extracted = storage.extract(takeAmount)
+            if (extracted <= 0) continue
+
+            // エネルギーをケーブルに分配
+            var remaining = extracted
+            for ((_, cableStorage) in cables) {
+                if (remaining <= 0) break
+                val space = cableStorage.maxEnergy - cableStorage.energy
+                val give = minOf(space, remaining)
+                cableStorage.energy += give
+                remaining -= give
+            }
        }
 
-        // ケーブルからタイル消費先(装置など)へ
-        val tileConsumers = tiles.filter { (_, storage) ->
+        // ケーブル -> 装置(消費装置)
+        val consumers = tiles.filter { (_, storage) ->
             storage.energy < storage.maxEnergy && storage.canInput
         }
 
-        for ((_, tileStorage) in tileConsumers) {
-            val capacity = tileStorage.maxEnergy - tileStorage.energy
+        for ((_, storage) in consumers) {
+            val capacity = storage.maxEnergy - storage.energy
             if (capacity <= 0) continue
 
             // ケーブルから出力可能な合計量を計算
@@ -104,48 +101,24 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
             for ((cable, cableStorage) in cables) {
                 available += minOf(cableStorage.energy, cable.maxOutput)
             }
+            if (available <= 0) continue // 挿入可能な量がない場合はスキップ
+
             val pushAmount = minOf(capacity, available)
-            if (pushAmount > 0) {
-                val inserted = tileStorage.insert(pushAmount)
-                if (inserted > 0) {
-                    // 挿入分をケーブルから引く
-                    var rem = inserted
-                    for ((cable, cableStorage) in cables) {
-                        if (rem <= 0) break
-                        val take = minOf(cableStorage.energy, cable.maxOutput, rem)
-                        if (take > 0) {
-                            cableStorage.energy -= take
-                            rem -= take
-                        }
-                    }
+            if (pushAmount <= 0) continue // 挿入する量がない場合はスキップ
+
+            val inserted = storage.insert(pushAmount)
+            if (inserted <= 0) continue // 挿入できた量がない場合はスキップ
+
+            // 挿入分をケーブルから引く
+            var remaining = inserted
+            for ((cable, cableStorage) in cables) {
+                if (remaining <= 0) break
+                val take = minOf(cableStorage.energy, cable.maxOutput, remaining)
+                if (take > 0) {
+                    cableStorage.energy -= take
+                    remaining -= take
                 }
             }
         }
-
-        // ネットワーク外の隣接EnergyStorageへ
-//        for ((cable, cableStorage) in cables) {
-//            val cablePos = net.pitan76.mcpitanlib.midohra.util.math.BlockPos.of(cable.callGetPos())
-//            for (dir in Direction.values()) {
-//                val neighborPos = cablePos.offset(dir)
-//                val neighborBe = world.getBlockEntity(neighborPos).get()
-//                if (neighborBe !is EnergyCableBlockEntity) {
-//                    if (tiles.any { it.first === neighborBe }) continue
-//
-//                    val storage = BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)
-//                    if (storage != null && storage !is TREnergyStorage && storage.supportsInsertion()) {
-//                        val sendAmount = minOf(cable.maxOutput, cableStorage.energy)
-//                        if (sendAmount > 0) {
-//                            Transaction.openOuter().use { transaction ->
-//                                val inserted = storage.insert(sendAmount, transaction)
-//                                if (inserted > 0) {
-//                                    transaction.commit()
-//                                    cableStorage.energy -= inserted
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 }
