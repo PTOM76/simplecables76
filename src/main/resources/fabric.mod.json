@@ -12,7 +12,7 @@
     "issues": "https://github.com/PTOM76/simplecables76/issues",
     "homepage": "https://curseforge/minecraft/mc-mods/simplecables76"
   },
-  "license": "MIT",
+  "license": "CC0-1.0",
   "icon": "assets/simplecables76/icon.png",
   "environment": "*",
   "entrypoints": {
