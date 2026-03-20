@@ -69,31 +69,31 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
 
         // タイル供給元(発電機など)からケーブルに
         val tileProviders = tiles.filter { (_, storage) -> storage.energy > 0 && storage.canOutput }
-        for ((_, tileStorage) in tileProviders) {
-            val totalCableCapacity = cables.sumOf { (_, s) -> s.maxEnergy - s.energy }
-            if (totalCableCapacity <= 0) break
+       for ((_, tileStorage) in tileProviders) {
+           val totalCableCapacity = cables.sumOf { (_, s) -> s.maxEnergy - s.energy }
+           if (totalCableCapacity <= 0) break
 
-            val takeAmount = minOf(tileStorage.energy, totalCableCapacity)
-            if (takeAmount > 0) {
-                val extracted = tileStorage.extract(takeAmount)
-                if (extracted > 0) {
-                    // 吸収したエネルギーをケーブルに分配
-                    var rem = extracted
-                    for ((_, cableStorage) in cables) {
-                        if (rem <= 0) break
-                        val space = cableStorage.maxEnergy - cableStorage.energy
-                        val give = minOf(space, rem)
-                        cableStorage.energy += give
-                        rem -= give
-                    }
-                }
-            }
-        }
+           val takeAmount = minOf(tileStorage.energy, totalCableCapacity)
+           if (takeAmount > 0) {
+               val extracted = tileStorage.extract(takeAmount)
+               if (extracted > 0) {
+                   // 吸収したエネルギーをケーブルに分配
+                   var rem = extracted
+                   for ((_, cableStorage) in cables) {
+                       if (rem <= 0) break
+                       val space = cableStorage.maxEnergy - cableStorage.energy
+                       val give = minOf(space, rem)
+                       cableStorage.energy += give
+                       rem -= give
+                   }
+               }
+           }
+       }
 
         // ケーブルからタイル消費先(装置など)へ
         val tileConsumers = tiles.filter { (_, storage) ->
             storage.energy < storage.maxEnergy && storage.canInput
-        }.filterNot { it in tileProviders }
+        }
 
         for ((_, tileStorage) in tileConsumers) {
             val capacity = tileStorage.maxEnergy - tileStorage.energy
