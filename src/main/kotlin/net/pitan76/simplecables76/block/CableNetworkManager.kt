@@ -5,7 +5,6 @@ import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import java.util.UUID
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
-import net.pitan76.mcpitanlib.midohra.util.math.Vector3i
 import net.pitan76.mcpitanlib.midohra.world.World
 import net.pitan76.simplecables76.compat.EnergyStorageWrapper
 import net.pitan76.simplecables76.compat.IEnergyStorage
@@ -19,10 +18,8 @@ object CableNetworkManager {
     // ネットワークIDごとにネットワーク情報（ケーブル、BlockEntity）を管理
     private val networkMap = mutableMapOf<UUID, CableNetwork>()
 
-    // BlockPosじゃなくてVector3iで管理するのは、MCPitanLib側のBlockPosはhashCodeがクソだったので次回から多分なおしてるはず、応急処置ですｗ
-    // TODO: 次回のMPLにしたら、こっちもBlockPosに戻す
     // 各ケーブルの位置 -> ネットワークID
-    private val cablePosToNetworkId = mutableMapOf<Pair<String, Vector3i>, UUID>()
+    private val cablePosToNetworkId = mutableMapOf<Pair<String, BlockPos>, UUID>()
 
     private fun getWorldId(world: World): String {
         return world.id.toString()
@@ -41,7 +38,7 @@ object CableNetworkManager {
      * 指定位置のケーブルが属するネットワークを取得（なければ探索）
      */
     fun getOrCreateNetwork(world: World, pos: BlockPos): CableNetwork {
-        val key = getWorldId(world) to Vector3i.of(pos)
+        val key = getWorldId(world) to pos
         val networkId = cablePosToNetworkId[key]
         if (networkId != null) {
             networkMap[networkId]?.let {
@@ -76,7 +73,8 @@ object CableNetworkManager {
                     val neighborPos = currentPos.offset(dir)
                     val neighborTile = world.getBlockEntity(neighborPos).get()
                     if (neighborTile is EnergyCableBlockEntity) {
-                        if (cables.none { it.first == neighborTile })
+//                        if (cables.none { it.first == neighborTile })
+                        if (!visited.contains(neighborPos))
                             queue.add(neighborPos)
                     } else {
                         if (tile.getEnergyStorage() is TREnergyStorage) {
@@ -106,7 +104,7 @@ object CableNetworkManager {
         cables.forEach { (cable, _) ->
             cable.networkId = newId
             val cablePos = BlockPos.of(cable.callGetPos())
-            cablePosToNetworkId[getWorldId(world) to Vector3i.of(cablePos)] = newId
+            cablePosToNetworkId[getWorldId(world) to cablePos] = newId
         }
 
         val network = CableNetwork(newId, cables, tiles)
@@ -136,4 +134,3 @@ object CableNetworkManager {
      */
     fun getNetworkById(id: UUID): CableNetwork? = networkMap[id]
 }
-
