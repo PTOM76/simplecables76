@@ -68,7 +68,10 @@ object CableNetworkManager {
             if (!visited.add(currentPos)) continue
             val tile = world.getBlockEntity(currentPos).get()
             if (tile is EnergyCableBlockEntity) {
-                if (tile.getEnergyStorage() == null) continue
+                // energyStorageがnullの場合は初期化する
+                if (tile.getEnergyStorage() == null) {
+                    tile.setEnergyStorage(TREnergyStorage(tile))
+                }
                 cables.add(tile to tile.getEnergyStorage()!!)
 
                 for (dir in Direction.values()) {
@@ -78,12 +81,16 @@ object CableNetworkManager {
 //                        if (cables.none { it.first == neighborTile })
                         if (!visited.contains(neighborPos))
                             queue.add(neighborPos)
-                    } else {
+                    } else if (neighborTile != null) {
+                        // 同じタイルが既に追加されていないかチェック
+                        if (tiles.any { it.first === neighborTile }) continue
+
                         if (tile.getEnergyStorage() is TREnergyStorage) {
                             BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)?.let { storage ->
                                 tiles.add(neighborTile to EnergyStorageWrapper(storage))
                             }
                         } else if (neighborTile is BaseEnergyTile) {
+                            if (neighborTile.getEnergyStorage() != null)
                                 tiles.add(neighborTile to neighborTile.getEnergyStorage()!!)
                         }
                     }

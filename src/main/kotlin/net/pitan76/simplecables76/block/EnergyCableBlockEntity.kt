@@ -15,6 +15,8 @@ import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.simplecables76.CableNetworkManager
 import net.pitan76.simplecables76.compat.TREnergyStorage
 import team.reborn.energy.api.EnergyStorage
+import techreborn.blockentity.cable.CableBlockEntity
+import techreborn.blocks.cable.CableBlock
 
 class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCableBlockEntity> {
     constructor(type: BlockEntityType<*>, e: TileCreateEvent) : super(type, e)
@@ -26,9 +28,9 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
     override val maxEnergy: Long
         get() = 1024
     override val maxOutput: Long
-        get() = 64
+        get() = 256
     override val maxInput: Long
-        get() = 64
+        get() = 256
 
     var networkId: UUID = UUID.randomUUID()
 
@@ -120,31 +122,30 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
             }
         }
 
-//         ネットワーク外の隣接EnergyStorageへ
-        for ((cable, cableStorage) in cables) {
-            val cablePos = net.pitan76.mcpitanlib.midohra.util.math.BlockPos.of(cable.callGetPos())
-            for (dir in Direction.values()) {
-                val neighborPos = cablePos.offset(dir)
-                val neighborBe = world.getBlockEntity(neighborPos).get()
-                if (neighborBe !is EnergyCableBlockEntity) {
-                    // ネットワーク内タイルはステップ2,3で処理済み
-                    if (tiles.any { it.first === neighborBe }) continue
-
-                    val storage = BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)
-                    if (storage != null && storage !is TREnergyStorage && storage.supportsInsertion()) {
-                        val sendAmount = minOf(cable.maxOutput, cableStorage.energy)
-                        if (sendAmount > 0) {
-                            Transaction.openOuter().use { transaction ->
-                                val inserted = storage.insert(sendAmount, transaction)
-                                if (inserted > 0) {
-                                    transaction.commit()
-                                    cableStorage.energy -= inserted
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // ネットワーク外の隣接EnergyStorageへ
+//        for ((cable, cableStorage) in cables) {
+//            val cablePos = net.pitan76.mcpitanlib.midohra.util.math.BlockPos.of(cable.callGetPos())
+//            for (dir in Direction.values()) {
+//                val neighborPos = cablePos.offset(dir)
+//                val neighborBe = world.getBlockEntity(neighborPos).get()
+//                if (neighborBe !is EnergyCableBlockEntity) {
+//                    if (tiles.any { it.first === neighborBe }) continue
+//
+//                    val storage = BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)
+//                    if (storage != null && storage !is TREnergyStorage && storage.supportsInsertion()) {
+//                        val sendAmount = minOf(cable.maxOutput, cableStorage.energy)
+//                        if (sendAmount > 0) {
+//                            Transaction.openOuter().use { transaction ->
+//                                val inserted = storage.insert(sendAmount, transaction)
+//                                if (inserted > 0) {
+//                                    transaction.commit()
+//                                    cableStorage.energy -= inserted
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 }
