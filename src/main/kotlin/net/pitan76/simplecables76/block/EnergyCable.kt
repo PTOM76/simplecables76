@@ -1,5 +1,7 @@
 package net.pitan76.simplecables76.block
 
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.pitan76.mcpitanlib.api.block.CompatBlockRenderType
@@ -17,6 +19,7 @@ import net.pitan76.mcpitanlib.midohra.fluid.Fluids
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.world.World
+import net.pitan76.simplecables76.CableNetworkManager
 import team.reborn.energy.api.EnergyStorage
 
 class EnergyCable : AbstractCable, CompatWaterloggable {
@@ -68,7 +71,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
 
     override fun onRightClick(e: BlockUseEvent): CompatActionResult {
         val blockEntity = e.blockEntity
-        if (blockEntity is BaseEnergyTile) {
+        if (blockEntity is BaseEnergyTile && (e.player.currentHandItem.isEmpty || e.player.currentHandItem.get().item !is BlockItem)) {
             if (e.isClient) return CompatActionResult.SUCCESS
             e.player.sendMessage("Energy: ${blockEntity.energy} / ${blockEntity.maxEnergy}")
         }

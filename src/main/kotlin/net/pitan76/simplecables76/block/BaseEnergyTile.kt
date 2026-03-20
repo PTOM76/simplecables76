@@ -28,6 +28,12 @@ abstract class BaseEnergyTile : CompatBlockEntity {
 
     var energy: Long = 0
 
+    val canInput: Boolean
+        get() = maxInput > 0
+
+    val canOutput: Boolean
+        get() = maxOutput > 0
+
     private var energyStorage: IEnergyStorage? = null
 
     fun setEnergyStorage(energyStorage: IEnergyStorage?) {

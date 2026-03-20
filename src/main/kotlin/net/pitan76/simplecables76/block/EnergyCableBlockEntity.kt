@@ -12,6 +12,7 @@ import net.pitan76.mcpitanlib.api.event.tile.TileTickEvent
 import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.api.tile.ExtendBlockEntityTicker
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
+import net.pitan76.simplecables76.CableNetworkManager
 import net.pitan76.simplecables76.compat.TREnergyStorage
 import team.reborn.energy.api.EnergyStorage
 
@@ -47,12 +48,16 @@ class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCab
 
         // CableNetworkManagerでネットワーク取得
         val network = CableNetworkManager.getOrCreateNetwork(world, pos)
+        if (network.cables.firstOrNull()?.first != this) return
+
         val cables = network.cables
         val tiles = network.tiles
 
         // 供給元/消費先
         val sources = (cables + tiles).filter { (_, storage) -> storage.energy > 0 && storage.maxOutput > 0 }
-        val sinks = (cables + tiles).filter { (_, storage) -> storage.energy < storage.maxEnergy && storage.maxInput > 0 }
+        val sinks = (cables + tiles)
+            .filter { (_, storage) -> storage.energy < storage.maxEnergy && storage.maxInput > 0 }
+            .filterNot { it.first in sources.map { s -> s.first } }
 
         // 分配アルゴリズム
         val totalEnergy = sources.sumOf { it.second.energy }

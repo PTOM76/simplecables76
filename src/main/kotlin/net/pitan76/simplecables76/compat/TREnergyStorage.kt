@@ -1,10 +1,12 @@
 package net.pitan76.simplecables76.compat
 
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant
 import net.pitan76.simplecables76.Config
 import net.pitan76.simplecables76.block.BaseEnergyTile
 import team.reborn.energy.api.EnergyStorage
+import kotlin.use
 
 class TREnergyStorage(val tile: BaseEnergyTile) : SnapshotParticipant<Long?>(), EnergyStorage, IEnergyStorage {
 
@@ -62,6 +64,32 @@ class TREnergyStorage(val tile: BaseEnergyTile) : SnapshotParticipant<Long?>(), 
 
     override val maxEnergy: Long
         get() = capacity
+
+    override val canInput: Boolean
+        get() = tile.canInput
+
+    override val canOutput: Boolean
+        get() = tile.canOutput
+
+    override fun insert(maxAmount: Long): Long {
+        Transaction.openOuter().use { transaction ->
+            val inserted = insert(maxAmount, transaction)
+            if (inserted > 0)
+                transaction.commit()
+
+            return inserted
+        }
+    }
+
+    override fun extract(maxAmount: Long): Long {
+        Transaction.openOuter().use { transaction ->
+            val extracted = extract(maxAmount, transaction)
+            if (extracted > 0)
+                transaction.commit()
+
+            return extracted
+        }
+    }
 
     override var energy: Long
         get() = tile.energy

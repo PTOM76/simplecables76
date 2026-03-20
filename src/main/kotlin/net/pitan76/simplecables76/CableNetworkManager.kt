@@ -1,15 +1,17 @@
-package net.pitan76.simplecables76.block
+package net.pitan76.simplecables76
 
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
-import java.util.UUID
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.world.World
+import net.pitan76.simplecables76.block.BaseEnergyTile
+import net.pitan76.simplecables76.block.EnergyCableBlockEntity
 import net.pitan76.simplecables76.compat.EnergyStorageWrapper
 import net.pitan76.simplecables76.compat.IEnergyStorage
 import net.pitan76.simplecables76.compat.TREnergyStorage
 import team.reborn.energy.api.EnergyStorage
+import java.util.UUID
 
 /**
  * ケーブルネットワーク全体を管理する、キャッシュ機構つき
@@ -119,7 +121,8 @@ object CableNetworkManager {
      */
     fun onCableChanged(world: World, pos: BlockPos) {
         // 自分と6方向のネットワークを再構築
-        val positions = listOf(pos) + listOf(pos.offset(Direction.UP), pos.offset(Direction.DOWN), pos.offset(Direction.NORTH), pos.offset(Direction.SOUTH), pos.offset(Direction.WEST), pos.offset(Direction.EAST))
+        val positions = listOf(pos) + listOf(pos.offset(Direction.UP), pos.offset(Direction.DOWN), pos.offset(Direction.NORTH), pos.offset(
+            Direction.SOUTH), pos.offset(Direction.WEST), pos.offset(Direction.EAST))
 
         positions.forEach { p ->
             val tile = world.getBlockEntity(p).get()
