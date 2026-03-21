@@ -16,15 +16,11 @@ object Config {
         if (this::configDir.isInitialized) return
         this.configDir = configDir
 
-        defaultConfig()
-
-        if (FileControl.fileExists(configFile)) {
+        if (FileControl.fileExists(configFile))
             config.load(configFile)
-        } else {
-            config.save(configFile)
-        }
 
         defaultConfig() // 既存設定以外をデフォルトに
+        config.save(configFile)
     }
 
     fun reload(): Boolean {

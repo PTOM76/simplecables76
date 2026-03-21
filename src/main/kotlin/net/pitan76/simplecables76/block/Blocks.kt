@@ -19,7 +19,7 @@ object Blocks {
         ENERGY_CABLE = registry.registerBlock(_id("energy_cable")) {
             EnergyCable(
                 CompatibleBlockSettings.of(_id("energy_cable"), CompatibleMaterial.STONE)
-                    .strength(1.0f, 6.0f),
+                    .strength(0.5f, 6.0f),
                 Config.energyCableTransferRate
             )
         }
@@ -27,7 +27,7 @@ object Blocks {
         COPPER_CABLE = registry.registerBlock(_id("copper_cable")) {
             CopperCable(
                 CompatibleBlockSettings.of(_id("copper_cable"), CompatibleMaterial.METAL)
-                    .strength(1.0f, 6.0f),
+                    .strength(0.5f, 6.0f),
                 Config.copperCableTransferRate
             )
         }
@@ -35,7 +35,7 @@ object Blocks {
         IRON_CABLE = registry.registerBlock(_id("iron_cable")) {
             IronCable(
                 CompatibleBlockSettings.of(_id("iron_cable"), CompatibleMaterial.METAL)
-                    .strength(1.0f, 6.0f),
+                    .strength(0.5f, 6.0f),
                 Config.ironCableTransferRate
             )
         }
@@ -43,7 +43,7 @@ object Blocks {
         GOLD_CABLE = registry.registerBlock(_id("gold_cable")) {
             GoldCable(
                 CompatibleBlockSettings.of(_id("gold_cable"), CompatibleMaterial.METAL)
-                    .strength(1.0f, 6.0f),
+                    .strength(0.5f, 6.0f),
                 Config.goldCableTransferRate
             )
         }
