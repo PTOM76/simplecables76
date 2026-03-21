@@ -141,7 +141,7 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
             }
 
             addGameVersion("Fabric")
-            mainArtifact(tasks.named("remapJar"))
+            mainArtifact(tasks.named("remapJar").get().outputs.files.singleFile)
 
             relations(closureOf<CurseRelation> {
                 requiredDependency("fabric-api")
@@ -175,7 +175,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         }
 
         versionType.set("release")
-        uploadFile.set(tasks.named("remapJar"))
+        uploadFile.set(tasks.named("remapJar").get().outputs.files.singleFile)
         changelog.set(project.property("changelog") as String + "\nMCPitanLib version: " + (project.property("mcpitanlib_version") as String).split(":")[1])
         loaders.set(listOf("fabric"))
 
