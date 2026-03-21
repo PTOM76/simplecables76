@@ -1,10 +1,16 @@
+import com.matthewprenger.cursegradle.CurseProject
+import com.matthewprenger.cursegradle.CurseRelation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import groovy.lang.Closure
+import org.gradle.kotlin.dsl.closureOf
 
 plugins {
     kotlin("jvm") version "2.2.21"
     id("fabric-loom") version "1.13-SNAPSHOT"
     id("maven-publish")
+    id("com.modrinth.minotaur") version "2.+"
+    id("com.matthewprenger.cursegradle") version "1.5.0"
 }
 
 version = project.property("mod_version") as String
@@ -93,5 +99,52 @@ publishing {
 
     repositories {
 
+    }
+}
+
+if (System.getenv("CURSEFORGE_TOKEN") != null) {
+    curseforge {
+        apiKey = System.getenv("CURSEFORGE_TOKEN")
+        project(closureOf<CurseProject> {
+            id = "1491488"
+            changelog = project.property("changelog") as String + "\nMCPitanLib version: " + (project.property("mcpitanlib_version") as String).split(":")[1]
+            releaseType = "release"
+            gameVersionStrings.addAll(listOf(
+                "1.18", "1.18.1", "1.18.2", "1.19", "1.19.1", "1.19.2", "1.20", "1.20.1",
+                "1.20.3", "1.20.4", "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4",
+                "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"
+            ))
+            addGameVersion("Fabric")
+            mainArtifact(tasks.named("remapJar"))
+
+            relations(closureOf<CurseRelation> {
+                requiredDependency("fabric-api")
+                requiredDependency("mcpitanlibarch")
+                requiredDependency("fabric-language-kotlin")
+            })
+        })
+    }
+}
+
+if (System.getenv("MODRINTH_TOKEN") != null) {
+    modrinth {
+        token.set(System.getenv("MODRINTH_TOKEN"))
+        projectId.set("simplecables76")
+        versionNumber.set(project.property("mod_version") as String + "-fabric")
+        gameVersions.set(listOf(
+            "1.18", "1.18.1", "1.18.2", "1.19", "1.19.1", "1.19.2", "1.20", "1.20.1",
+            "1.20.3", "1.20.4", "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4",
+            "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"
+        ))
+        versionType.set("release")
+        uploadFile.set(tasks.named("remapJar"))
+        changelog.set(project.property("changelog") as String + "\nMCPitanLib version: " + (project.property("mcpitanlib_version") as String).split(":")[1])
+        loaders.set(listOf("fabric"))
+
+        dependencies {
+            required.project("P7dR8mSH") // Fabric API
+            required.project("uNRoUnGT")
+            required.project("fabric-language-kotlin")
+        }
     }
 }
