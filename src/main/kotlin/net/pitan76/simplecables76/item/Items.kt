@@ -11,12 +11,30 @@ import net.pitan76.simplecables76.block.Blocks
 
 object Items {
     lateinit var ENERGY_CABLE : RegistryResult<Item>
+    lateinit var COPPER_CABLE : RegistryResult<Item>
+    lateinit var IRON_CABLE : RegistryResult<Item>
+    lateinit var GOLD_CABLE : RegistryResult<Item>
 
     @JvmStatic
     fun init() {
         ENERGY_CABLE = registry.registerItem(_id("energy_cable")) {
-            ItemUtil.create(Blocks.ENERGY_CABLE.orNull, CompatibleItemSettings.of(_id("energy_cable")).addGroup(
-                DefaultItemGroups.TRANSPORTATION))
+            ItemUtil.create(Blocks.ENERGY_CABLE.orNull, CompatibleItemSettings.of(_id("energy_cable"))
+                .addGroup(DefaultItemGroups.TRANSPORTATION))
+        }
+
+        COPPER_CABLE = registry.registerItem(_id("copper_cable")) {
+            ItemUtil.create(Blocks.COPPER_CABLE.orNull, CompatibleItemSettings.of(_id("copper_cable"))
+                .addGroup(DefaultItemGroups.TRANSPORTATION))
+        }
+
+        IRON_CABLE = registry.registerItem(_id("iron_cable")) {
+            ItemUtil.create(Blocks.IRON_CABLE.orNull, CompatibleItemSettings.of(_id("iron_cable"))
+                .addGroup(DefaultItemGroups.TRANSPORTATION))
+        }
+
+        GOLD_CABLE = registry.registerItem(_id("gold_cable")) {
+            ItemUtil.create(Blocks.GOLD_CABLE.orNull, CompatibleItemSettings.of(_id("gold_cable"))
+                .addGroup(DefaultItemGroups.TRANSPORTATION))
         }
     }
 }

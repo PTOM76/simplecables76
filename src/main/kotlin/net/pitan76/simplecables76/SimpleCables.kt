@@ -33,6 +33,8 @@ class SimpleCables : ExtendModInitializer() {
         Items.init();
         BlockEntities.init();
 
+        Config.init(PlatformUtil.getConfigFolderAsFile());
+
         registerEnergyStorage();
     }
 
