@@ -2,7 +2,6 @@ import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import groovy.lang.Closure
 import org.gradle.kotlin.dsl.closureOf
 
 plugins {
@@ -13,7 +12,15 @@ plugins {
     id("com.matthewprenger.cursegradle") version "1.5.0"
 }
 
-version = project.property("mod_version") as String
+val modVersion = when (project.findProperty("tr_energy_version") as? String) {
+    "2.3.0" -> "${project.property("mod_version")}.180"
+    "3.0.0" -> "${project.property("mod_version")}.201"
+    "4.1.0" -> "${project.property("mod_version")}.210"
+    "4.2.0" -> "${project.property("mod_version")}.215"
+    else -> project.property("mod_version")
+}
+version = modVersion!!
+
 group = project.property("maven_group") as String
 
 base {
@@ -55,7 +62,14 @@ dependencies {
     modImplementation("RebornCore:RebornCore-1.20:5.10.3")
     modImplementation("TechReborn:TechReborn-1.20:5.10.3")
 
-    modImplementation("teamreborn:energy:${project.property("tr_energy_version")}")
+    /*
+    Version 2.x should be used for Minecraft 1.18-1.19.2 -> 2.3.0
+    Version 3.x should be used for Minecraft 1.20.1-1.20.4 -> 3.0.0
+    Version 4.1.x should be used for Minecraft 1.20-1.21.4 -> 4.1.0
+    Version 4.2.x should be used for Minecraft 1.21.5-1.21.11 -> 4.2.0
+     */
+    modApi("teamreborn:energy:${project.property("tr_energy_version")}")
+    include("teamreborn:energy:${project.property("tr_energy_version")}")
 }
 
 tasks.processResources {
@@ -109,11 +123,23 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
             id = "1491488"
             changelog = project.property("changelog") as String + "\nMCPitanLib version: " + (project.property("mcpitanlib_version") as String).split(":")[1]
             releaseType = "release"
-            gameVersionStrings.addAll(listOf(
-                "1.18", "1.18.1", "1.18.2", "1.19", "1.19.1", "1.19.2", "1.20", "1.20.1",
-                "1.20.3", "1.20.4", "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4",
-                "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"
-            ))
+
+            if (project.property("tr_energy_version") as String == "2.3.0") {
+                gameVersionStrings.addAll(listOf("1.18", "1.18.1", "1.18.2", "1.19", "1.19.1", "1.19.2"))
+            }
+
+            if (project.property("tr_energy_version") as String == "3.0.0") {
+                gameVersionStrings.addAll(listOf("1.20.1", "1.20.3", "1.20.4"))
+            }
+
+            if (project.property("tr_energy_version") as String == "4.1.0") {
+                gameVersionStrings.addAll(listOf("1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"))
+            }
+
+            if (project.property("tr_energy_version") as String == "4.2.0") {
+                gameVersionStrings.addAll(listOf("1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"))
+            }
+
             addGameVersion("Fabric")
             mainArtifact(tasks.named("remapJar"))
 
@@ -131,11 +157,23 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
         token.set(System.getenv("MODRINTH_TOKEN"))
         projectId.set("simplecables76")
         versionNumber.set(project.property("mod_version") as String + "-fabric")
-        gameVersions.set(listOf(
-            "1.18", "1.18.1", "1.18.2", "1.19", "1.19.1", "1.19.2", "1.20", "1.20.1",
-            "1.20.3", "1.20.4", "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4",
-            "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"
-        ))
+
+        if (project.property("tr_energy_version") as String == "2.3.0") {
+            gameVersions.set(listOf("1.18", "1.18.1", "1.18.2", "1.19", "1.19.1", "1.19.2"))
+        }
+
+        if (project.property("tr_energy_version") as String == "3.0.0") {
+            gameVersions.set(listOf("1.20.1", "1.20.3", "1.20.4"))
+        }
+
+        if (project.property("tr_energy_version") as String == "4.1.0") {
+            gameVersions.set(listOf("1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"))
+        }
+
+        if (project.property("tr_energy_version") as String == "4.2.0") {
+            gameVersions.set(listOf("1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"))
+        }
+
         versionType.set("release")
         uploadFile.set(tasks.named("remapJar"))
         changelog.set(project.property("changelog") as String + "\nMCPitanLib version: " + (project.property("mcpitanlib_version") as String).split(":")[1])
