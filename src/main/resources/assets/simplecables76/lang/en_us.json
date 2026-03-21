@@ -1,3 +1,4 @@
 {
-  "block.simplecables76.energy_cable": "Energy Cable"
+  "block.simplecables76.energy_cable": "Energy Cable",
+  "tooltip.simplecables76.energy_cable": "§bTransfer Rate: %d E/t"
 }

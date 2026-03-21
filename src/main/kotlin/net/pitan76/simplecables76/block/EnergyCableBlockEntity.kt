@@ -12,18 +12,30 @@ import net.pitan76.mcpitanlib.api.tile.ExtendBlockEntityTicker
 import net.pitan76.simplecables76.CableNetworkManager
 
 class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCableBlockEntity> {
-    constructor(type: BlockEntityType<*>, e: TileCreateEvent) : super(type, e)
+    constructor(type: BlockEntityType<*>, e: TileCreateEvent, speed: Int): super(type, e) {
+        this.speed = speed
+    }
 
-    constructor(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) : super(type, pos, state)
+    constructor(type: BlockEntityType<*>, e: TileCreateEvent): this(type, e, 512)
 
-    constructor(e: TileCreateEvent) : this(BlockEntities.ENERGY_CABLE.get(), e)
+    constructor(type: BlockEntityType<*>, pos: BlockPos, state: BlockState, speed: Int): super(type, pos, state) {
+        this.speed = speed
+    }
+
+    constructor(type: BlockEntityType<*>, pos: BlockPos, state: BlockState): this(type, pos, state, 512)
+
+    constructor(e: TileCreateEvent, speed: Int): this(BlockEntities.ENERGY_CABLE.get(), e, speed)
+
+    constructor(e: TileCreateEvent): this(e, 512)
+
+    val speed: Int
 
     override val maxEnergy: Long
-        get() = 1024
+        get() = speed.toLong() * 4
     override val maxOutput: Long
-        get() = 256
+        get() = speed.toLong()
     override val maxInput: Long
-        get() = 256
+        get() = speed.toLong()
 
     // キャッシュ用のネットワークID。CableNetworkManagerで管理する
     var networkId: UUID = UUID.randomUUID()

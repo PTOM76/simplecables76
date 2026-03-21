@@ -13,7 +13,10 @@ object Blocks {
     @JvmStatic
     fun init() {
         ENERGY_CABLE = registry.registerBlock(_id("energy_cable")) {
-            EnergyCable(CompatibleBlockSettings.of(_id("energy_cable"), CompatibleMaterial.STONE))
+            EnergyCable(
+                CompatibleBlockSettings.of(_id("energy_cable"), CompatibleMaterial.STONE).strength(0.5f, 0.5f),
+                512
+            )
         }
     }
 }

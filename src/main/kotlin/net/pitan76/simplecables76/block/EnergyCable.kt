@@ -1,7 +1,6 @@
 package net.pitan76.simplecables76.block
 
 import net.minecraft.world.item.BlockItem
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.phys.shapes.VoxelShape
 import net.pitan76.mcpitanlib.api.block.CompatBlockRenderType
@@ -11,6 +10,7 @@ import net.pitan76.mcpitanlib.api.block.args.v2.OutlineShapeEvent
 import net.pitan76.mcpitanlib.api.block.args.v2.PlacementStateArgs
 import net.pitan76.mcpitanlib.api.block.v2.CompatibleBlockSettings
 import net.pitan76.mcpitanlib.api.event.block.*
+import net.pitan76.mcpitanlib.api.event.item.ItemAppendTooltipEvent
 import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.api.state.property.CompatProperties
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
@@ -24,9 +24,14 @@ import team.reborn.energy.api.EnergyStorage
 
 class EnergyCable : AbstractCable, CompatWaterloggable {
 
-    constructor(settings: CompatibleBlockSettings) : super(settings) {
+    var speed: Int // ケーブルの伝達速度（例: 512.0 E/t）
+
+    constructor(settings: CompatibleBlockSettings, speed: Int) : super(settings) {
         setDefaultState(DirectionBoolPropertyUtil.clearAll(defaultMidohraState).with(CompatProperties.WATERLOGGED, false))
+        this.speed = speed
     }
+
+    constructor(settings: CompatibleBlockSettings) : this(settings, 512)
 
     override fun getOutlineShape(e: OutlineShapeEvent): VoxelShape {
         var shape = getCenterShape()
@@ -137,7 +142,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
     }
 
     override fun createBlockEntity(e: TileCreateEvent): CompatBlockEntity {
-        return EnergyCableBlockEntity(e)
+        return EnergyCableBlockEntity(e, speed)
     }
 
     override fun isTick(): Boolean {
@@ -179,5 +184,10 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
         if (blockEntity !is EnergyCableBlockEntity) return
 
         updateConnections(e.midohraWorld, e.midohraPos, blockEntity)
+    }
+
+    override fun appendTooltip(e: ItemAppendTooltipEvent?) {
+        super.appendTooltip(e)
+        e?.addTooltip(TextUtil.translatable("tooltip.simplecables76.energy_cable", speed))
     }
 }

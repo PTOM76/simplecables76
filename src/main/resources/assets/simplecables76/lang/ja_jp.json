@@ -1,3 +1,4 @@
 {
-  "block.simplecables76.energy_cable": "エネルギーケーブル"
+  "block.simplecables76.energy_cable": "エネルギーケーブル",
+  "tooltip.simplecables76.energy_cable": "§b伝達速度: %d E/t"
 }
