@@ -5,8 +5,8 @@ import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.world.World
-import net.pitan76.simplecables76.block.BaseEnergyTile
-import net.pitan76.simplecables76.block.EnergyCableBlockEntity
+import net.pitan76.simplecables76.block.entity.AbstractEnergyBlockEntity
+import net.pitan76.simplecables76.block.entity.EnergyCableBlockEntity
 import net.pitan76.simplecables76.compat.EnergyStorageWrapper
 import net.pitan76.simplecables76.compat.IEnergyStorage
 import net.pitan76.simplecables76.compat.TREnergyStorage
@@ -166,7 +166,7 @@ object CableNetworkManager {
                             BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)?.let { storage ->
                                 tiles.add(neighborTile to EnergyStorageWrapper(storage))
                             }
-                        } else if (neighborTile is BaseEnergyTile) {
+                        } else if (neighborTile is AbstractEnergyBlockEntity) {
                             if (neighborTile.getEnergyStorage() != null)
                                 tiles.add(neighborTile to neighborTile.getEnergyStorage()!!)
                         }

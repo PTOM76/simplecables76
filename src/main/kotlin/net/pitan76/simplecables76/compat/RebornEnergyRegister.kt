@@ -1,8 +1,8 @@
 package net.pitan76.simplecables76.compat
 
 import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
-import net.pitan76.simplecables76.block.BaseEnergyTile
-import net.pitan76.simplecables76.block.BlockEntities
+import net.pitan76.simplecables76.block.entity.AbstractEnergyBlockEntity
+import net.pitan76.simplecables76.block.entity.BlockEntities
 import team.reborn.energy.api.EnergyStorage
 
 object RebornEnergyRegister {
@@ -11,7 +11,7 @@ object RebornEnergyRegister {
 
         for (supplier in listOf(BlockEntities.ENERGY_CABLE, BlockEntities.COPPER_CABLE, BlockEntities.IRON_CABLE, BlockEntities.GOLD_CABLE)) {
             BlockApiLookupWithDirection(EnergyStorage.SIDED).registerForBlockEntityM({ blockEntity, _ ->
-                if (blockEntity is BaseEnergyTile) {
+                if (blockEntity is AbstractEnergyBlockEntity) {
                     if (blockEntity.getEnergyStorage() is TREnergyStorage)
                         return@registerForBlockEntityM blockEntity.getEnergyStorage() as TREnergyStorage
 

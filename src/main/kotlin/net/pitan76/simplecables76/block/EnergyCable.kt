@@ -20,9 +20,12 @@ import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.world.World
 import net.pitan76.simplecables76.CableNetworkManager
+import net.pitan76.simplecables76.Config
+import net.pitan76.simplecables76.block.entity.AbstractEnergyBlockEntity
+import net.pitan76.simplecables76.block.entity.EnergyCableBlockEntity
 import team.reborn.energy.api.EnergyStorage
 
-class EnergyCable : AbstractCable, CompatWaterloggable {
+open class EnergyCable : AbstractCable, CompatWaterloggable {
 
     var speed: Int // ケーブルの伝達速度（例: 512.0 E/t）
 
@@ -31,7 +34,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
         this.speed = speed
     }
 
-    constructor(settings: CompatibleBlockSettings) : this(settings, 512)
+    constructor(settings: CompatibleBlockSettings) : this(settings, Config.energyCableTransferRate)
 
     override fun getOutlineShape(e: OutlineShapeEvent): VoxelShape {
         var shape = getCenterShape()
@@ -76,7 +79,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
 
     override fun onRightClick(e: BlockUseEvent): CompatActionResult {
         val blockEntity = e.blockEntity
-        if (blockEntity is BaseEnergyTile && (e.player.currentHandItem.isEmpty || e.player.currentHandItem.get().item !is BlockItem)) {
+        if (blockEntity is AbstractEnergyBlockEntity && (e.player.currentHandItem.isEmpty || e.player.currentHandItem.get().item !is BlockItem)) {
             if (e.isClient) return CompatActionResult.SUCCESS
             e.player.sendMessage("Energy: ${blockEntity.energy} / ${blockEntity.maxEnergy}")
         }
@@ -104,7 +107,7 @@ class EnergyCable : AbstractCable, CompatWaterloggable {
             }
 //            }
 
-            if (neighborTile is BaseEnergyTile) {
+            if (neighborTile is AbstractEnergyBlockEntity) {
                 DirectionBoolPropertyUtil.setProperty(world, pos, dir, true)
                 continue
             }

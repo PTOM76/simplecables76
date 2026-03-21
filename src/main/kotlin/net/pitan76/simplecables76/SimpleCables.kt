@@ -4,7 +4,7 @@ import net.pitan76.mcpitanlib.api.registry.v2.CompatRegistryV2
 import net.pitan76.mcpitanlib.api.util.CompatIdentifier
 import net.pitan76.mcpitanlib.api.util.PlatformUtil
 import net.pitan76.mcpitanlib.fabric.ExtendModInitializer
-import net.pitan76.simplecables76.block.BlockEntities
+import net.pitan76.simplecables76.block.entity.BlockEntities
 import net.pitan76.simplecables76.block.Blocks
 import net.pitan76.simplecables76.item.Items
 import net.pitan76.simplecables76.compat.RebornEnergyRegister

@@ -4,11 +4,11 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant
 import net.pitan76.simplecables76.Config
-import net.pitan76.simplecables76.block.BaseEnergyTile
+import net.pitan76.simplecables76.block.entity.AbstractEnergyBlockEntity
 import team.reborn.energy.api.EnergyStorage
 import kotlin.use
 
-class TREnergyStorage(val tile: BaseEnergyTile) : SnapshotParticipant<Long?>(), EnergyStorage, IEnergyStorage {
+class TREnergyStorage(val tile: AbstractEnergyBlockEntity) : SnapshotParticipant<Long?>(), EnergyStorage, IEnergyStorage {
 
     val usableCapacity: Long
         get() = (tile.usableCapacity / CONVERSION_RATE).toLong()

@@ -1,4 +1,4 @@
-package net.pitan76.simplecables76.block
+package net.pitan76.simplecables76.block.entity
 
 import java.util.UUID
 import net.minecraft.core.BlockPos
@@ -10,23 +10,24 @@ import net.pitan76.mcpitanlib.api.event.nbt.WriteNbtArgs
 import net.pitan76.mcpitanlib.api.event.tile.TileTickEvent
 import net.pitan76.mcpitanlib.api.tile.ExtendBlockEntityTicker
 import net.pitan76.simplecables76.CableNetworkManager
+import net.pitan76.simplecables76.Config
 
-class EnergyCableBlockEntity : BaseEnergyTile, ExtendBlockEntityTicker<EnergyCableBlockEntity> {
+open class EnergyCableBlockEntity : AbstractEnergyBlockEntity, ExtendBlockEntityTicker<EnergyCableBlockEntity> {
     constructor(type: BlockEntityType<*>, e: TileCreateEvent, speed: Int): super(type, e) {
         this.speed = speed
     }
 
-    constructor(type: BlockEntityType<*>, e: TileCreateEvent): this(type, e, 512)
+    constructor(type: BlockEntityType<*>, e: TileCreateEvent): this(type, e, Config.energyCableTransferRate)
 
     constructor(type: BlockEntityType<*>, pos: BlockPos, state: BlockState, speed: Int): super(type, pos, state) {
         this.speed = speed
     }
 
-    constructor(type: BlockEntityType<*>, pos: BlockPos, state: BlockState): this(type, pos, state, 512)
+    constructor(type: BlockEntityType<*>, pos: BlockPos, state: BlockState): this(type, pos, state, Config.energyCableTransferRate)
 
     constructor(e: TileCreateEvent, speed: Int): this(BlockEntities.ENERGY_CABLE.get(), e, speed)
 
-    constructor(e: TileCreateEvent): this(e, 512)
+    constructor(e: TileCreateEvent): this(e, Config.energyCableTransferRate)
 
     val speed: Int
 
