@@ -41,17 +41,17 @@ object CableNetworkManager {
             if (tiles.isEmpty()) return
 
             // ケーブル間のエネルギー均等化
-            val totalCableEnergy = cables.sumOf { it.second.energy }
+//            val totalCableEnergy = cables.sumOf { it.second.energy }
 //        cables.shuffled()
-            if (cables.isNotEmpty() && totalCableEnergy > 0) {
-                val perCable = totalCableEnergy / cables.size
-                val remainder = totalCableEnergy % cables.size
-                var i = 0
-                for ((_, storage) in cables) {
-                    storage.energy = perCable + if (i < remainder) 1 else 0
-                    i++
-                }
-            }
+//            if (cables.isNotEmpty() && totalCableEnergy > 0) {
+//                val perCable = totalCableEnergy / cables.size
+//                val remainder = totalCableEnergy % cables.size
+//                var i = 0
+//                for ((_, storage) in cables) {
+//                    storage.energy = perCable + if (i < remainder) 1 else 0
+//                    i++
+//                }
+//            }
 
             // 発電機など(供給装置) -> ケーブル
             // EnergyStorageに登録しているが、modによっては引き出せないことがあるので一応、実装しておく
