@@ -8,16 +8,19 @@ import team.reborn.energy.api.EnergyStorage
 object RebornEnergyRegister {
     fun init() {
         println("Registering Reborn Energy Storage for Energy Cable")
-        BlockApiLookupWithDirection(EnergyStorage.SIDED).registerForBlockEntityM({ blockEntity, _ ->
-            if (blockEntity is BaseEnergyTile) {
-                if (blockEntity.getEnergyStorage() is TREnergyStorage)
-                    return@registerForBlockEntityM blockEntity.getEnergyStorage() as TREnergyStorage
 
-                if (!blockEntity.hasEnergyStorage())
-                    blockEntity.setEnergyStorage(TREnergyStorage(blockEntity))
-            }
+        for (supplier in listOf(BlockEntities.ENERGY_CABLE, BlockEntities.COPPER_CABLE, BlockEntities.IRON_CABLE, BlockEntities.GOLD_CABLE)) {
+            BlockApiLookupWithDirection(EnergyStorage.SIDED).registerForBlockEntityM({ blockEntity, _ ->
+                if (blockEntity is BaseEnergyTile) {
+                    if (blockEntity.getEnergyStorage() is TREnergyStorage)
+                        return@registerForBlockEntityM blockEntity.getEnergyStorage() as TREnergyStorage
 
-            return@registerForBlockEntityM null
-        }, BlockEntities.ENERGY_CABLE.get())
+                    if (!blockEntity.hasEnergyStorage())
+                        blockEntity.setEnergyStorage(TREnergyStorage(blockEntity))
+                }
+
+                return@registerForBlockEntityM null
+            }, supplier.get())
+        }
     }
 }
