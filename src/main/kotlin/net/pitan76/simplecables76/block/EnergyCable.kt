@@ -1,5 +1,6 @@
 package net.pitan76.simplecables76.block
 
+import net.minecraft.network.chat.Style
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.phys.shapes.VoxelShape
@@ -13,6 +14,7 @@ import net.pitan76.mcpitanlib.api.event.block.*
 import net.pitan76.mcpitanlib.api.event.item.ItemAppendTooltipEvent
 import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.api.state.property.CompatProperties
+import net.pitan76.mcpitanlib.api.text.TextComponent
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
 import net.pitan76.mcpitanlib.api.util.*
 import net.pitan76.mcpitanlib.midohra.fluid.Fluids
@@ -191,6 +193,6 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 
     override fun appendTooltip(e: ItemAppendTooltipEvent?) {
         super.appendTooltip(e)
-        e?.addTooltip(TextUtil.translatable("tooltip.simplecables76.energy_cable", speed))
+        e?.addTooltip(TextComponent.translatable("tooltip.simplecables76.energy_cable", speed).setStyle(StyleUtil.withColor(Style.EMPTY, 5636095)).asMutableText())
     }
 }
