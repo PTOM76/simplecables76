@@ -1,4 +1,7 @@
 {
   "block.simplecables76.energy_cable": "Energy Cable",
+  "block.simplecables76.copper_cable": "Copper Cable",
+  "block.simplecables76.iron_cable": "Iron Cable",
+  "block.simplecables76.gold_cable": "Gold Cable",
   "tooltip.simplecables76.energy_cable": "§bTransfer Rate: %d E/t"
 }

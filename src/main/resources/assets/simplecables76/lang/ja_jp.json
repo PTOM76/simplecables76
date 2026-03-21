@@ -1,4 +1,7 @@
 {
   "block.simplecables76.energy_cable": "エネルギーケーブル",
+  "block.simplecables76.copper_cable": "銅ケーブル",
+  "block.simplecables76.iron_cable": "鉄ケーブル",
+  "block.simplecables76.gold_cable": "金ケーブル",
   "tooltip.simplecables76.energy_cable": "§b伝達速度: %d E/t"
 }

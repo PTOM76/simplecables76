@@ -1,0 +1,7 @@
+{
+  "parent": "simplecables76:block/energy_cable",
+  "textures": {
+    "particle": "simplecables76:block/energy_cable/gold",
+    "cable": "simplecables76:block/energy_cable/gold"
+  }
+}

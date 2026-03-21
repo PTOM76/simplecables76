@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "simplecables76:energy_cable"
+    "simplecables76:energy_cable",
+    "simplecables76:copper_cable",
+    "simplecables76:iron_cable",
+    "simplecables76:gold_cable"
   ]
 }
