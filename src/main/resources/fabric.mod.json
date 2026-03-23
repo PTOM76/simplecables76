@@ -28,6 +28,6 @@
     "fabric-language-kotlin": "*",
     "fabric": "*",
     "minecraft": "*",
-    "mcpitanlib": ">=3.0.0"
+    "mcpitanlib": ">3.4.9"
   }
 }

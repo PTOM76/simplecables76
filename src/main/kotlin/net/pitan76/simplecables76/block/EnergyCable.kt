@@ -14,6 +14,8 @@ import net.pitan76.mcpitanlib.api.event.block.*
 import net.pitan76.mcpitanlib.api.event.item.ItemAppendTooltipEvent
 import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.api.state.property.CompatProperties
+import net.pitan76.mcpitanlib.api.text.CompatFormatting
+import net.pitan76.mcpitanlib.api.text.CompatStyle
 import net.pitan76.mcpitanlib.api.text.TextComponent
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
 import net.pitan76.mcpitanlib.api.util.*
@@ -193,6 +195,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 
     override fun appendTooltip(e: ItemAppendTooltipEvent?) {
         super.appendTooltip(e)
-        e?.addTooltip(TextComponent.translatable("tooltip.simplecables76.energy_cable", speed).setStyle(StyleUtil.withColor(Style.EMPTY, 5636095)).asMutableText())
+        val style = CompatStyle().withColor(CompatFormatting.AQUA);
+        e?.addTooltip(TextComponent.translatable("tooltip.simplecables76.energy_cable", speed).setStyle(style))
     }
 }

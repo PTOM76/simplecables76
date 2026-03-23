@@ -92,8 +92,4 @@ abstract class AbstractEnergyBlockEntity : CompatBlockEntity {
         this.energy -= amount
         return amount
     }
-
-    fun init() {
-
-    }
 }
