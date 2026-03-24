@@ -129,10 +129,24 @@ object CableNetworkManager {
         return searchNetwork(world, pos)
     }
 
+    fun clearCache() {
+        networkMap.clear()
+        cablePosToNetworkId.clear()
+    }
+
+    fun clearCache(world: World) {
+        val worldId = getWorldId(world)
+        val keysToRemove = cablePosToNetworkId.keys.filter { it.first == worldId }
+        keysToRemove.forEach { cablePosToNetworkId.remove(it) }
+        networkMap.clear()
+    }
+
     /**
      * ネットワーク探索
      */
     fun searchNetwork(world: World, startPos: BlockPos): CableNetwork {
+//        println("Searching network from ${startPos.toRaw().toString()}... ")
+
         val visited = mutableSetOf<BlockPos>()
         val queue = ArrayDeque<BlockPos>()
         val cables = mutableSetOf<Pair<EnergyCableBlockEntity, IEnergyStorage>>()

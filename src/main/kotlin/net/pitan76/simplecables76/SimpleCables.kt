@@ -1,10 +1,11 @@
 package net.pitan76.simplecables76
 
-import net.fabricmc.loader.api.FabricLoader
+import net.pitan76.mcpitanlib.api.event.v0.EventRegistry
 import net.pitan76.mcpitanlib.api.registry.v2.CompatRegistryV2
 import net.pitan76.mcpitanlib.api.util.CompatIdentifier
 import net.pitan76.mcpitanlib.api.util.PlatformUtil
 import net.pitan76.mcpitanlib.fabric.ExtendModInitializer
+import net.pitan76.mcpitanlib.midohra.world.World
 import net.pitan76.simplecables76.block.Blocks
 import net.pitan76.simplecables76.block.entity.BlockEntities
 import net.pitan76.simplecables76.compat.RebornEnergyRegister
@@ -37,6 +38,12 @@ class SimpleCables : ExtendModInitializer() {
         Config.init(PlatformUtil.getConfigFolderAsFile());
 
         registerEnergyStorage();
+
+        // Clear cache when world unloads to prevent invalid cache access (rejoin)
+        EventRegistry.ServerLifecycle.serverWorldUnload { world ->
+            CableNetworkManager.clearCache(World.of(world))
+        }
+
 //        check(!FabricLoader.getInstance().allMods.stream().noneMatch(
 //            { it.metadata.id.startsWith("team_reborn_energy") })
 //        ) { "Energy API is not working..." }

@@ -1,6 +1,5 @@
 package net.pitan76.simplecables76.block
 
-import net.minecraft.network.chat.Style
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.phys.shapes.VoxelShape
