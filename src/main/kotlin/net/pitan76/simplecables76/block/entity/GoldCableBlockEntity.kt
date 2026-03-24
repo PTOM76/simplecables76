@@ -6,5 +6,5 @@ import net.pitan76.simplecables76.Config
 class GoldCableBlockEntity : EnergyCableBlockEntity {
     constructor(e: TileCreateEvent, speed: Int): super(BlockEntities.GOLD_CABLE.get(), e, speed)
 
-    constructor(e: TileCreateEvent): super(e, Config.goldCableTransferRate)
+    constructor(e: TileCreateEvent): this(e, Config.goldCableTransferRate)
 }
