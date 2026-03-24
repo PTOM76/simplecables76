@@ -1,6 +1,9 @@
 # Simple Cables (English)
 This minecraft mod adds cables for transmitting energy in FabricMC.
 
+- CurseForge: https://www.curseforge.com/minecraft/mc-mods/simplecables76
+- Modrinth: https://modrinth.com/mod/simplecables76
+
 ## Libraries
 - Fabric API
 - MCPitanLib
