@@ -8,7 +8,7 @@ This minecraft mod adds cables for transmitting energy in FabricMC.
 - Fabric API
 - MCPitanLib
 - Fabric Language Kotlin
-- Reborn Energy API (might be included internally, still considering)
+- Reborn Energy API (included internally)
 
 ## Blocks
 - Energy Cable - A cable that transmits energy, only obtainable in creative mode (512 E/t)
@@ -36,7 +36,7 @@ The transfer rate values represent the amount of energy transferred per tick.
 - Fabric API
 - MCPitanLib
 - Fabric Language Kotlin
-- Reborn Energy API (内部に組み込むかも、悩み中)
+- Reborn Energy API (内部に埋込済み)
 
 ## ブロック
 - エネルギーケーブル - エネルギーを伝送する、クリエイティブモードでのみ入手可能なケーブル (512 E/t)
