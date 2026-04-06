@@ -17,6 +17,7 @@ val modVersion = when (project.findProperty("tr_energy_version") as? String) {
     "3.0.0" -> "${project.property("mod_version")}.201"
     "4.1.0" -> "${project.property("mod_version")}.210"
     "4.2.0" -> "${project.property("mod_version")}.215"
+    "5.0.0" -> "${project.property("mod_version")}.261"
     else -> project.property("mod_version")
 }
 version = modVersion!!
@@ -67,6 +68,7 @@ dependencies {
     Version 3.x should be used for Minecraft 1.20.1-1.20.4 -> 3.0.0
     Version 4.1.x should be used for Minecraft 1.20-1.21.4 -> 4.1.0
     Version 4.2.x should be used for Minecraft 1.21.5-1.21.11 -> 4.2.0
+    Version 5.0.x should be used for Minecraft 26.1-26.1.1 -> 5.0.0
      */
     modApi("teamreborn:energy:${project.property("tr_energy_version")}")
     include("teamreborn:energy:${project.property("tr_energy_version")}")
@@ -140,6 +142,10 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
                 gameVersionStrings.addAll(listOf("1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"))
             }
 
+            if (project.property("tr_energy_version") as String == "5.0.0") {
+                gameVersionStrings.addAll(listOf("26.1", "26.1.1"))
+            }
+
             addGameVersion("Fabric")
             mainArtifact(tasks.named("remapJar").get().outputs.files.singleFile)
 
@@ -172,6 +178,10 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
 
         if (project.property("tr_energy_version") as String == "4.2.0") {
             gameVersions.set(listOf("1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"))
+        }
+
+        if (project.property("tr_energy_version") as String == "5.0.0") {
+            gameVersions.set(listOf("26.1", "26.1.1"))
         }
 
         versionType.set("release")
