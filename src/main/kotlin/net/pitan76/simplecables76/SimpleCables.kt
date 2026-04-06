@@ -5,7 +5,6 @@ import net.pitan76.mcpitanlib.api.registry.v2.CompatRegistryV2
 import net.pitan76.mcpitanlib.api.util.CompatIdentifier
 import net.pitan76.mcpitanlib.api.util.PlatformUtil
 import net.pitan76.mcpitanlib.fabric.ExtendModInitializer
-import net.pitan76.mcpitanlib.midohra.registry.MidohraRegistry
 import net.pitan76.mcpitanlib.midohra.world.World
 import net.pitan76.simplecables76.block.Blocks
 import net.pitan76.simplecables76.block.entity.BlockEntities
@@ -17,7 +16,7 @@ class SimpleCables : ExtendModInitializer() {
         const val MOD_ID: String = "simplecables76";
         const val MOD_NAME: String = "SimpleCables";
 
-        lateinit var registry: MidohraRegistry;
+        lateinit var registry: CompatRegistryV2;
 
         /**
          * @param path The path of the id
@@ -30,7 +29,7 @@ class SimpleCables : ExtendModInitializer() {
     }
 
     override fun init() {
-        Companion.registry = MidohraRegistry.of(super.registry);
+        Companion.registry = super.registry;
 
         Blocks.init();
         Items.init();
@@ -42,12 +41,12 @@ class SimpleCables : ExtendModInitializer() {
 
         // Clear cache when world unloads to prevent invalid cache access (rejoin)
         EventRegistry.ServerLifecycle.serverWorldUnload { world ->
-            CableNetworkManager.clearCache(World.of(world))
-        }
+            CableNetworkManager.clearCache(World.of(world));
+        };
 
 //        check(!FabricLoader.getInstance().allMods.stream().noneMatch(
 //            { it.metadata.id.startsWith("team_reborn_energy") })
-//        ) { "Energy API is not working..." }
+//        ) { "Energy API is not working..." };
     }
 
     fun registerEnergyStorage() {

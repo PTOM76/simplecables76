@@ -1,17 +1,18 @@
 package net.pitan76.simplecables76.block
 
+import net.minecraft.world.level.block.Block
 import net.pitan76.mcpitanlib.api.block.CompatibleMaterial
 import net.pitan76.mcpitanlib.api.block.v2.CompatibleBlockSettings
-import net.pitan76.mcpitanlib.midohra.block.TypedBlockWrapper
+import net.pitan76.mcpitanlib.api.registry.result.RegistryResult
 import net.pitan76.simplecables76.Config
 import net.pitan76.simplecables76.SimpleCables.Companion._id
 import net.pitan76.simplecables76.SimpleCables.Companion.registry
 
 object Blocks {
-    lateinit var ENERGY_CABLE: TypedBlockWrapper<EnergyCable>
-    lateinit var COPPER_CABLE: TypedBlockWrapper<CopperCable>
-    lateinit var IRON_CABLE: TypedBlockWrapper<IronCable>
-    lateinit var GOLD_CABLE: TypedBlockWrapper<GoldCable>
+    lateinit var ENERGY_CABLE: RegistryResult<Block>
+    lateinit var COPPER_CABLE: RegistryResult<Block>
+    lateinit var IRON_CABLE: RegistryResult<Block>
+    lateinit var GOLD_CABLE: RegistryResult<Block>
 
     @JvmStatic
     fun init() {
