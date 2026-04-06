@@ -8,7 +8,7 @@ import net.pitan76.simplecables76.block.entity.AbstractEnergyBlockEntity
 import team.reborn.energy.api.EnergyStorage
 import kotlin.use
 
-class TREnergyStorage(val tile: AbstractEnergyBlockEntity) : SnapshotParticipant<Long?>(), EnergyStorage, IEnergyStorage {
+class TREnergyStorage(val tile: AbstractEnergyBlockEntity) : SnapshotParticipant<Long>(), EnergyStorage, IEnergyStorage {
 
     val usableCapacity: Long
         get() = (tile.usableCapacity / CONVERSION_RATE).toLong()
@@ -51,8 +51,7 @@ class TREnergyStorage(val tile: AbstractEnergyBlockEntity) : SnapshotParticipant
         return tile.energy
     }
 
-    override fun readSnapshot(snapshot: Long?) {
-        if (snapshot == null) return
+    override fun readSnapshot(snapshot: Long) {
         tile.energy = snapshot
     }
 

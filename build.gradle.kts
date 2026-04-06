@@ -70,13 +70,12 @@ dependencies {
     Version 4.2.x should be used for Minecraft 1.21.5-1.21.11 -> 4.2.0
     Version 5.0.x should be used for Minecraft 26.1-26.1.1 -> 5.0.0
      */
-    if (project.property("tr_energy_version") as String >= "5.0.0") {
-        api("teamreborn:energy:${project.property("tr_energy_version")}")
-        include("teamreborn:energy:${project.property("tr_energy_version")}")
-    } else {
-        modApi("teamreborn:energy:${project.property("tr_energy_version")}")
-        include("teamreborn:energy:${project.property("tr_energy_version")}")
-    }
+//    if (project.property("tr_energy_version") as String >= "5.0.0") {
+//        api("teamreborn:energy:${project.property("tr_energy_version")}")
+//    } else {
+    modApi("teamreborn:energy:3.0.0")
+//    }
+    include("teamreborn:energy:${project.property("tr_energy_version")}")
 }
 
 tasks.processResources {

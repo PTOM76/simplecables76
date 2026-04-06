@@ -11,7 +11,6 @@ import net.pitan76.mcpitanlib.api.block.args.v2.PlacementStateArgs
 import net.pitan76.mcpitanlib.api.block.v2.CompatibleBlockSettings
 import net.pitan76.mcpitanlib.api.event.block.*
 import net.pitan76.mcpitanlib.api.event.item.ItemAppendTooltipEvent
-import net.pitan76.mcpitanlib.api.lookup.block.BlockApiLookupWithDirection
 import net.pitan76.mcpitanlib.api.state.property.CompatProperties
 import net.pitan76.mcpitanlib.api.text.CompatFormatting
 import net.pitan76.mcpitanlib.api.text.CompatStyle
@@ -26,7 +25,7 @@ import net.pitan76.simplecables76.CableNetworkManager
 import net.pitan76.simplecables76.Config
 import net.pitan76.simplecables76.block.entity.AbstractEnergyBlockEntity
 import net.pitan76.simplecables76.block.entity.EnergyCableBlockEntity
-import team.reborn.energy.api.EnergyStorage
+import net.pitan76.simplecables76.compat.RebornEnergyRegister
 
 open class EnergyCable : AbstractCable, CompatWaterloggable {
 
@@ -104,7 +103,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
             }
 
 //            if (tile.getEnergyStorage() is TREnergyStorage) {
-            BlockApiLookupWithDirection(EnergyStorage.SIDED).find(world, neighborPos, dir.opposite)?.let { _ ->
+            RebornEnergyRegister.ENERGY_LOOKUP.find(world, neighborPos, dir.opposite)?.let { _ ->
                 DirectionBoolPropertyUtil.setProperty(world, pos, dir, true)
                 continue
             }
