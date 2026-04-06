@@ -20,15 +20,15 @@ val modVersion = when (project.findProperty("tr_energy_version") as? String) {
     "5.0.0" -> "${project.property("mod_version")}.261"
     else -> project.property("mod_version")
 }
-version = modVersion!!
 
+version = modVersion!!
 group = project.property("maven_group") as String
 
 base {
     archivesName.set(project.property("archives_base_name") as String)
 }
 
-val targetJavaVersion = 17
+val targetJavaVersion = if (project.property("tr_energy_version") as String >= "5.0.0") 25 else 17
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     withSourcesJar()
@@ -70,8 +70,13 @@ dependencies {
     Version 4.2.x should be used for Minecraft 1.21.5-1.21.11 -> 4.2.0
     Version 5.0.x should be used for Minecraft 26.1-26.1.1 -> 5.0.0
      */
-    modApi("teamreborn:energy:${project.property("tr_energy_version")}")
-    include("teamreborn:energy:${project.property("tr_energy_version")}")
+    if (project.property("tr_energy_version") as String >= "5.0.0") {
+        api("teamreborn:energy:${project.property("tr_energy_version")}")
+        include("teamreborn:energy:${project.property("tr_energy_version")}")
+    } else {
+        modApi("teamreborn:energy:${project.property("tr_energy_version")}")
+        include("teamreborn:energy:${project.property("tr_energy_version")}")
+    }
 }
 
 tasks.processResources {
@@ -83,9 +88,9 @@ tasks.processResources {
     filesMatching("fabric.mod.json") {
         expand(
             "version" to project.version,
-            "minecraft_version" to project.property("minecraft_version"),
-            "loader_version" to project.property("loader_version"),
-            "kotlin_loader_version" to project.property("kotlin_loader_version")
+            "minecraft_version" to project.property("minecraft_version") as String,
+            "loader_version" to project.property("loader_version") as String,
+            "kotlin_loader_version" to project.property("kotlin_loader_version") as String
         )
     }
 }
