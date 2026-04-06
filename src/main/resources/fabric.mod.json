@@ -26,8 +26,7 @@
   "depends": {
     "fabricloader": "*",
     "fabric-language-kotlin": "*",
-    "fabric": "*",
     "minecraft": "*",
-    "mcpitanlib": ">3.4.9"
+    "mcpitanlib": ">3.6.2"
   }
 }
