@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.kotlin.dsl.closureOf
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.20"
     id("fabric-loom") version "1.13-SNAPSHOT"
     id("maven-publish")
     id("com.modrinth.minotaur") version "2.+"
