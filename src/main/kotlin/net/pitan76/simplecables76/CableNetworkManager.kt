@@ -1,6 +1,7 @@
 package net.pitan76.simplecables76
 
 import net.minecraft.world.level.block.entity.BlockEntity
+import net.pitan76.mcpitanlib.api.util.BlockEntityUtil
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.world.World
@@ -214,7 +215,7 @@ object CableNetworkManager {
         // ケーブルに新ネットワークIDを付与し、マップを更新
         cables.forEach { (cable, _) ->
             cable.networkId = newId
-            val cablePos = BlockPos.of(cable.callGetPos())
+            val cablePos = cable.midohraPos
             cablePosToNetworkId[getWorldId(world) to cablePos] = newId
         }
 
@@ -247,11 +248,11 @@ object CableNetworkManager {
         println("Cable Network ID: ${network.id}")
         println("Cables (${network.cables.size}):")
         network.cables.forEach { (cable, storage) ->
-            println("- ${cable.callGetPos()}: ${storage.energy}/${storage.maxEnergy}")
+            println("- ${cable.midohraPos.toRaw()}: ${storage.energy}/${storage.maxEnergy}")
         }
         println("Tiles (${network.tiles.size}):")
         network.tiles.forEach { (tile, storage) ->
-            println("- ${tile.blockPos}: ${storage.energy}/${storage.maxEnergy}")
+            println("- ${BlockEntityUtil.getPos(tile)}: ${storage.energy}/${storage.maxEnergy}")
         }
 
         println()
