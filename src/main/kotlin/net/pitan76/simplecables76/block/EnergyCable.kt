@@ -14,9 +14,11 @@ import net.pitan76.mcpitanlib.api.text.CompatFormatting
 import net.pitan76.mcpitanlib.api.text.CompatStyle
 import net.pitan76.mcpitanlib.api.text.TextComponent
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
-import net.pitan76.mcpitanlib.api.util.*
+import net.pitan76.mcpitanlib.api.util.CompatActionResult
+import net.pitan76.mcpitanlib.api.util.DirectionBoolPropertyUtil
+import net.pitan76.mcpitanlib.api.util.FluidStateUtil
+import net.pitan76.mcpitanlib.api.util.FluidUtil
 import net.pitan76.mcpitanlib.midohra.fluid.Fluids
-import net.pitan76.mcpitanlib.midohra.item.ItemStack
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
 import net.pitan76.mcpitanlib.midohra.util.shape.VoxelShape
@@ -79,6 +81,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
         if (blockEntity is AbstractEnergyBlockEntity && (e.stackM.isEmpty || !e.stackM.isBlockItem)) {
             if (e.isClient) return e.success()
             e.player.sendMessage("Energy: ${blockEntity.energy} / ${blockEntity.maxEnergy}")
+            CableNetworkManager.printLog(e.midohraWorld, e.midohraPos)
         }
 
         return super.onRightClick(e)
@@ -184,7 +187,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
         if (blockEntity !is EnergyCableBlockEntity) return
 
         updateConnections(e.midohraWorld, e.midohraPos, blockEntity)
-        CableNetworkManager.onCableChanged(e.midohraWorld, e.midohraPos)
+//        CableNetworkManager.onCableChanged(e.midohraWorld, e.midohraPos)
     }
 
     override fun appendTooltip(e: ItemAppendTooltipEvent?) {
