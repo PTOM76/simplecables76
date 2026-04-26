@@ -15,18 +15,20 @@ object RebornEnergyRegister {
     fun init() {
         println("Registering Reborn Energy Storage for Energy Cable")
 
-        for (supplier in listOf(BlockEntities.ENERGY_CABLE, BlockEntities.COPPER_CABLE, BlockEntities.IRON_CABLE, BlockEntities.GOLD_CABLE)) {
-            ENERGY_LOOKUP.registerForBlockEntityM({ blockEntity, _ ->
-                if (blockEntity is AbstractEnergyBlockEntity) {
+        for (wrapper in listOf(BlockEntities.ENERGY_CABLE, BlockEntities.COPPER_CABLE, BlockEntities.IRON_CABLE, BlockEntities.GOLD_CABLE)) {
+            ENERGY_LOOKUP.registerForBlockEntityWrapperM({ wrapper, _ ->
+                if (wrapper.instanceOf(AbstractEnergyBlockEntity::class.java)) {
+                    val blockEntity = wrapper.getCompatBlockEntity(AbstractEnergyBlockEntity::class.java)
+
                     if (blockEntity.getEnergyStorage() is TREnergyStorage)
-                        return@registerForBlockEntityM blockEntity.getEnergyStorage() as TREnergyStorage
+                        return@registerForBlockEntityWrapperM blockEntity.getEnergyStorage() as TREnergyStorage
 
                     if (!blockEntity.hasEnergyStorage())
                         blockEntity.setEnergyStorage(TREnergyStorage(blockEntity))
                 }
 
-                return@registerForBlockEntityM null
-            }, supplier.get())
+                return@registerForBlockEntityWrapperM null
+            }, wrapper)
         }
     }
 }
