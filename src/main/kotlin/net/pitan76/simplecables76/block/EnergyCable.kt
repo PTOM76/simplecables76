@@ -189,6 +189,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
         if (blockEntity !is EnergyCableBlockEntity) return
 
         updateConnections(e.midohraWorld, e.midohraPos, blockEntity)
+        CableNetworkManager.onCableChanged(e.midohraWorld, e.midohraPos)
     }
 
     override fun appendTooltip(e: ItemAppendTooltipEvent?) {
