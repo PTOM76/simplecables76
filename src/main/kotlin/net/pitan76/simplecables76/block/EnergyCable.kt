@@ -1,8 +1,6 @@
 package net.pitan76.simplecables76.block
 
-import net.minecraft.world.item.BlockItem
 import net.minecraft.world.level.material.FluidState
-import net.minecraft.world.phys.shapes.VoxelShape
 import net.pitan76.mcpitanlib.api.block.CompatBlockRenderType
 import net.pitan76.mcpitanlib.api.block.CompatWaterloggable
 import net.pitan76.mcpitanlib.api.block.args.RenderTypeArgs
@@ -18,8 +16,10 @@ import net.pitan76.mcpitanlib.api.text.TextComponent
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
 import net.pitan76.mcpitanlib.api.util.*
 import net.pitan76.mcpitanlib.midohra.fluid.Fluids
+import net.pitan76.mcpitanlib.midohra.item.ItemStack
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
+import net.pitan76.mcpitanlib.midohra.util.shape.VoxelShape
 import net.pitan76.mcpitanlib.midohra.world.World
 import net.pitan76.simplecables76.CableNetworkManager
 import net.pitan76.simplecables76.Config
@@ -38,51 +38,46 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 
     constructor(settings: CompatibleBlockSettings) : this(settings, Config.energyCableTransferRate)
 
-    override fun getOutlineShape(e: OutlineShapeEvent): VoxelShape {
+    override fun getOutlineShape(e: OutlineShapeEvent): net.minecraft.world.phys.shapes.VoxelShape {
         var shape = getCenterShape()
 
         if (e.get(CompatProperties.UP)) {
-            shape = VoxelShapeUtil.union(shape,
-                VoxelShapeUtil.blockCuboid(5.0, 11.0, 5.0,
-                    11.0, 16.0, 11.0))
+            shape = shape.union(
+                VoxelShape.blockCuboid(5.0, 11.0, 5.0, 11.0, 16.0, 11.0))
         }
         if (e.get(CompatProperties.DOWN)) {
-            shape = VoxelShapeUtil.union(shape,
-                VoxelShapeUtil.blockCuboid(5.0, 0.0, 5.0,
-                    11.0, 5.0, 11.0))
+            shape = shape.union(
+                VoxelShape.blockCuboid(5.0, 0.0, 5.0, 11.0, 5.0, 11.0))
         }
         if (e.get(CompatProperties.NORTH)) {
-            shape = VoxelShapeUtil.union(shape,
-                VoxelShapeUtil.blockCuboid(5.0, 5.0, 0.0,
-                    11.0, 11.0, 5.0))
+            shape = shape.union(
+                VoxelShape.blockCuboid(5.0, 5.0, 0.0, 11.0, 11.0, 5.0))
         }
         if (e.get(CompatProperties.EAST)) {
-            shape = VoxelShapeUtil.union(shape,
-                VoxelShapeUtil.blockCuboid(11.0, 5.0, 5.0,
-                    16.0, 11.0, 11.0))
+            shape = shape.union(
+                VoxelShape.blockCuboid(11.0, 5.0, 5.0, 16.0, 11.0, 11.0))
         }
         if (e.get(CompatProperties.SOUTH)) {
-            shape = VoxelShapeUtil.union(shape,
-                VoxelShapeUtil.blockCuboid(5.0, 5.0, 11.0,
-                    11.0, 11.0, 16.0))
+            shape = shape.union(
+                VoxelShape.blockCuboid(5.0, 5.0, 11.0, 11.0, 11.0, 16.0))
         }
         if (e.get(CompatProperties.WEST)) {
-            shape = VoxelShapeUtil.union(shape,
-                VoxelShapeUtil.blockCuboid(0.0, 5.0, 5.0,
-                    5.0, 11.0, 11.0))
+            shape = shape.union(
+                VoxelShape.blockCuboid(0.0, 5.0, 5.0, 5.0, 11.0, 11.0))
         }
 
-        return shape
+        return shape.raw();
     }
 
     fun getCenterShape(): VoxelShape {
-        return VoxelShapeUtil.blockCuboid(5.0, 5.0, 5.0, 11.0, 11.0, 11.0)
+        return VoxelShape.blockCuboid(5.0, 5.0, 5.0, 11.0, 11.0, 11.0)
     }
 
     override fun onRightClick(e: BlockUseEvent): CompatActionResult {
         val blockEntity = e.blockEntity
-        if (blockEntity is AbstractEnergyBlockEntity && (e.player.currentHandItem.isEmpty || e.player.currentHandItem.get().item !is BlockItem)) {
-            if (e.isClient) return CompatActionResult.SUCCESS
+
+        if (blockEntity is AbstractEnergyBlockEntity && (e.stackM.isEmpty || !e.stackM.isBlockItem)) {
+            if (e.isClient) return e.success()
             e.player.sendMessage("Energy: ${blockEntity.energy} / ${blockEntity.maxEnergy}")
         }
 

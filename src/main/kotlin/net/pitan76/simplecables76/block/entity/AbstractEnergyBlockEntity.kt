@@ -1,20 +1,16 @@
 package net.pitan76.simplecables76.block.entity
 
-import net.minecraft.core.BlockPos
-import net.minecraft.world.level.block.entity.BlockEntityType
-import net.minecraft.world.level.block.state.BlockState
 import net.pitan76.mcpitanlib.api.event.block.TileCreateEvent
 import net.pitan76.mcpitanlib.api.event.nbt.ReadNbtArgs
 import net.pitan76.mcpitanlib.api.event.nbt.WriteNbtArgs
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
 import net.pitan76.mcpitanlib.api.util.nbt.v2.NbtRWUtil
+import net.pitan76.mcpitanlib.midohra.block.entity.BlockEntityTypeWrapper
 import net.pitan76.simplecables76.compat.IEnergyStorage
 
 abstract class AbstractEnergyBlockEntity : CompatBlockEntity {
 
-    constructor(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) : super(type, pos, state)
-
-    constructor(type: BlockEntityType<*>, e: TileCreateEvent) : super(type, e)
+    constructor(type: BlockEntityTypeWrapper, e: TileCreateEvent) : super(type, e)
 
     abstract val maxEnergy: Long
 

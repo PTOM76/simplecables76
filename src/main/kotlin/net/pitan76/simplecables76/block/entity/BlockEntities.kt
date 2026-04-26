@@ -1,19 +1,18 @@
 package net.pitan76.simplecables76.block.entity
 
-import net.minecraft.world.level.block.entity.BlockEntityType
-import net.pitan76.mcpitanlib.api.registry.result.SupplierResult
 import net.pitan76.mcpitanlib.api.tile.BlockEntityTypeBuilder
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
 import net.pitan76.mcpitanlib.midohra.block.SupplierBlockWrapper
+import net.pitan76.mcpitanlib.midohra.block.entity.TypedBlockEntityTypeWrapper
 import net.pitan76.simplecables76.SimpleCables
 import net.pitan76.simplecables76.SimpleCables.Companion.registry
 import net.pitan76.simplecables76.block.Blocks
 
 object BlockEntities {
-    lateinit var ENERGY_CABLE: SupplierResult<BlockEntityType<EnergyCableBlockEntity?>>
-    lateinit var COPPER_CABLE: SupplierResult<BlockEntityType<EnergyCableBlockEntity?>>
-    lateinit var IRON_CABLE: SupplierResult<BlockEntityType<EnergyCableBlockEntity?>>
-    lateinit var GOLD_CABLE: SupplierResult<BlockEntityType<EnergyCableBlockEntity?>>
+    lateinit var ENERGY_CABLE: TypedBlockEntityTypeWrapper<EnergyCableBlockEntity?>
+    lateinit var COPPER_CABLE: TypedBlockEntityTypeWrapper<EnergyCableBlockEntity?>
+    lateinit var IRON_CABLE: TypedBlockEntityTypeWrapper<EnergyCableBlockEntity?>
+    lateinit var GOLD_CABLE: TypedBlockEntityTypeWrapper<EnergyCableBlockEntity?>
 
     @JvmStatic
     fun init() {
