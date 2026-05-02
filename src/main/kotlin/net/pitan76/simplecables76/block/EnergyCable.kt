@@ -1,6 +1,5 @@
 package net.pitan76.simplecables76.block
 
-import net.minecraft.world.level.material.FluidState
 import net.pitan76.mcpitanlib.api.block.CompatBlockRenderType
 import net.pitan76.mcpitanlib.api.block.CompatWaterloggable
 import net.pitan76.mcpitanlib.api.block.args.RenderTypeArgs
@@ -16,8 +15,8 @@ import net.pitan76.mcpitanlib.api.text.TextComponent
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
 import net.pitan76.mcpitanlib.api.util.CompatActionResult
 import net.pitan76.mcpitanlib.api.util.DirectionBoolPropertyUtil
-import net.pitan76.mcpitanlib.api.util.FluidStateUtil
 import net.pitan76.mcpitanlib.api.util.FluidUtil
+import net.pitan76.mcpitanlib.midohra.fluid.FluidState
 import net.pitan76.mcpitanlib.midohra.fluid.Fluids
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
 import net.pitan76.mcpitanlib.midohra.util.math.Direction
@@ -40,7 +39,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 
     constructor(settings: CompatibleBlockSettings) : this(settings, Config.energyCableTransferRate)
 
-    override fun getOutlineShape(e: OutlineShapeEvent): net.minecraft.world.phys.shapes.VoxelShape {
+    override fun getOutlineShapeM(e: OutlineShapeEvent): VoxelShape {
         var shape = getCenterShape()
 
         if (e.get(CompatProperties.UP)) {
@@ -68,7 +67,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
                 VoxelShape.blockCuboid(0.0, 5.0, 5.0, 5.0, 11.0, 11.0))
         }
 
-        return shape.raw();
+        return shape;
     }
 
     fun getCenterShape(): VoxelShape {
@@ -94,8 +93,8 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 
         for (dir in Direction.values()) {
             val neighborPos = pos.offset(dir)
-            val neighborTile = world.getBlockEntity(neighborPos).get()
-            if (neighborTile is EnergyCableBlockEntity) {
+            val neighborTile = world.getBlockEntity(neighborPos)
+            if (neighborTile.instanceOf(EnergyCableBlockEntity::class.java)) {
                 DirectionBoolPropertyUtil.setProperty(world, pos, dir, true)
                 continue
             }
@@ -107,7 +106,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
             }
 //            }
 
-            if (neighborTile is AbstractEnergyBlockEntity) {
+            if (neighborTile.instanceOf(AbstractEnergyBlockEntity::class.java)) {
                 DirectionBoolPropertyUtil.setProperty(world, pos, dir, true)
                 continue
             }
@@ -162,18 +161,18 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
         return CompatBlockRenderType.MODEL
     }
 
-    override fun getFluidState(args: FluidStateArgs?): FluidState? {
-        if (args != null && CompatProperties.WATERLOGGED.get(args.state)) {
-            return FluidUtil.getStillWater()
+    override fun getFluidStateM(args: FluidStateArgs): FluidState {
+        if (CompatProperties.WATERLOGGED.get(args.state)) {
+            return FluidState.of(FluidUtil.getStillWater());
         }
 
-        return super.getFluidState(args)
+        return super.getFluidStateM(args)
     }
 
     override fun getPlacementState(args: PlacementStateArgs?): net.pitan76.mcpitanlib.midohra.block.BlockState? {
         if (args != null) {
             return this.defaultMidohraState.with(CompatProperties.WATERLOGGED,
-                FluidStateUtil.getFluidWrapper(args.world, args.pos) == Fluids.WATER)
+                args.world.getFluid(args.pos).equals(Fluids.WATER))
         }
 
         return super.getPlacementState(args as PlacementStateArgs?)
@@ -190,9 +189,9 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 //        CableNetworkManager.onCableChanged(e.midohraWorld, e.midohraPos)
     }
 
-    override fun appendTooltip(e: ItemAppendTooltipEvent?) {
+    override fun appendTooltip(e: ItemAppendTooltipEvent) {
         super.appendTooltip(e)
         val style = CompatStyle().withColor(CompatFormatting.AQUA);
-        e?.addTooltip(TextComponent.translatable("tooltip.simplecables76.energy_cable", speed).setStyle(style))
+        e.addTooltip(TextComponent.translatable("tooltip.simplecables76.energy_cable", speed).setStyle(style))
     }
 }
