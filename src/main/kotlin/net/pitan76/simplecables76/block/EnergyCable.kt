@@ -15,7 +15,9 @@ import net.pitan76.mcpitanlib.api.text.TextComponent
 import net.pitan76.mcpitanlib.api.tile.CompatBlockEntity
 import net.pitan76.mcpitanlib.api.util.CompatActionResult
 import net.pitan76.mcpitanlib.api.util.DirectionBoolPropertyUtil
-import net.pitan76.mcpitanlib.api.util.FluidUtil
+import net.pitan76.mcpitanlib.core.serialization.CompatMapCodec
+import net.pitan76.mcpitanlib.core.serialization.codecs.CompatBlockMapCodecUtil
+import net.pitan76.mcpitanlib.midohra.block.BlockState
 import net.pitan76.mcpitanlib.midohra.fluid.FluidState
 import net.pitan76.mcpitanlib.midohra.fluid.Fluids
 import net.pitan76.mcpitanlib.midohra.util.math.BlockPos
@@ -31,6 +33,15 @@ import net.pitan76.simplecables76.compat.RebornEnergyRegister
 open class EnergyCable : AbstractCable, CompatWaterloggable {
 
     var speed: Int // ケーブルの伝達速度（例: 512.0 E/t）
+
+    protected open val CODEC: CompatMapCodec<out EnergyCable> =
+        CompatBlockMapCodecUtil.createCodec<EnergyCable> { settings: CompatibleBlockSettings ->
+            EnergyCable(settings, Config.energyCableTransferRate)
+        }
+
+    override fun getCompatCodec(): CompatMapCodec<out EnergyCable> {
+        return CODEC
+    }
 
     constructor(settings: CompatibleBlockSettings, speed: Int) : super(settings) {
         setDefaultState(DirectionBoolPropertyUtil.clearAll(defaultMidohraState).with(CompatProperties.WATERLOGGED, false))
@@ -124,7 +135,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 //            CableNetworkManager.printLog(e.midohraWorld, e.midohraPos)
         }
 
-        val cable = e.blockEntity as? EnergyCableBlockEntity
+        val cable = e.blockEntityWrapper.getCompatBlockEntity(EnergyCableBlockEntity::class.java)
         if (cable != null) {
             updateConnections(e.midohraWorld, e.midohraPos, cable)
         }
@@ -138,7 +149,7 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 //            CableNetworkManager.printLog(e.midohraWorld, e.midohraPos)
         }
 
-        val cable = e.blockEntity as? EnergyCableBlockEntity
+        val cable = e.blockEntityWrapper.getCompatBlockEntity(EnergyCableBlockEntity::class.java)
         if (cable != null) {
             updateConnections(e.midohraWorld, e.midohraPos, cable)
         }
@@ -166,13 +177,13 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
 
     override fun getFluidStateM(args: FluidStateArgs): FluidState {
         if (CompatProperties.WATERLOGGED.get(args.state)) {
-            return FluidState.of(FluidUtil.getStillWater());
+            return FluidState.water()
         }
 
         return super.getFluidStateM(args)
     }
 
-    override fun getPlacementState(args: PlacementStateArgs?): net.pitan76.mcpitanlib.midohra.block.BlockState? {
+    override fun getPlacementState(args: PlacementStateArgs?): BlockState? {
         if (args != null) {
             return this.defaultMidohraState.with(CompatProperties.WATERLOGGED,
                 args.world.getFluid(args.pos).equals(Fluids.WATER))
@@ -185,11 +196,9 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
         super.neighborUpdate(e)
         if (e == null) return
 
-        val blockEntity = e.blockEntity
-        if (blockEntity !is EnergyCableBlockEntity) return
+        if (!e.blockEntityWrapper.instanceOf(EnergyCableBlockEntity::class.java)) return
 
-        updateConnections(e.midohraWorld, e.midohraPos, blockEntity)
-//        CableNetworkManager.onCableChanged(e.midohraWorld, e.midohraPos)
+        updateConnections(e.midohraWorld, e.midohraPos, e.blockEntityWrapper.getCompatBlockEntity(EnergyCableBlockEntity::class.java))
     }
 
     override fun appendTooltip(e: ItemAppendTooltipEvent) {
