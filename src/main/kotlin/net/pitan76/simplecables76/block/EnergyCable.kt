@@ -75,9 +75,12 @@ open class EnergyCable : AbstractCable, CompatWaterloggable {
     }
 
     override fun onRightClick(e: BlockUseEvent): CompatActionResult {
-        val blockEntity = e.blockEntity
+        val blockEntityWrapper = e.blockEntityWrapper
+        val stack = e.stackM
 
-        if (blockEntity is AbstractEnergyBlockEntity && (e.stackM.isEmpty || !e.stackM.isBlockItem)) {
+        if (blockEntityWrapper.instanceOf(AbstractEnergyBlockEntity::class.java) && (stack.isEmpty || !stack.isBlockItem)) {
+            val blockEntity = blockEntityWrapper.getCompatBlockEntity(AbstractEnergyBlockEntity::class.java)
+
             if (e.isClient) return e.success()
             e.player.sendMessage("Energy: ${blockEntity.energy} / ${blockEntity.maxEnergy}")
             CableNetworkManager.printLog(e.midohraWorld, e.midohraPos)
